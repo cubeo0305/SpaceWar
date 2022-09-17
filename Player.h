@@ -22,24 +22,37 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+#ifndef __Player_SCENE_H__
+#define __Player_SCENE_H__
 
 #include "cocos2d.h"
 
-class HelloWorld : public cocos2d::Scene
+class Player : public cocos2d::Scene
 {
 public:
     static cocos2d::Scene* createScene();
+    void update(float dt);
     virtual bool init();
-        
-    cocos2d::Sprite* Player;
- 
+
+    cocos2d::Sprite* player;
+
+    cocos2d::Vec2 direction;
+
+    void onMouseDown(cocos2d::Event* event);
+    void onMouseUp(cocos2d::Event* event);
+    void onMouseMove(cocos2d::Event* event);
+    void Shooting();
+    void setIsShooting(bool isShooting);
+
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
+    bool isKeyDown = false;
+    float speed;
+
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-    
-    // implement the "static create()" method manually
-    CREATE_FUNC(HelloWorld);
+    CREATE_FUNC(Player);
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif // __PLAYER_SCENE_H__
