@@ -1,0 +1,24 @@
+assault
+{
+	maxHP = 75
+	Damage = 20
+	attackSpeed = 1s/hit
+}
+Tank
+{
+	maxHP = 100
+	shield = 50
+	Damage = 10
+	attackSpeed = 2s/hit
+}
+Player
+{
+	maxHP = 100
+	Damage = 18
+}
+Boss
+{
+	maxHp = 1000
+	Damage = 25
+	attackSpeed = 3s/6 hit
+}
