@@ -84,7 +84,7 @@ void Player::setIsShooting(bool isShooting)
         // Schedule shooting
         this->player->schedule([&](float dt) {
             this->Shooting();
-            }, 0.1, "PlayerShooting");
+            }, 0.3, "PlayerShooting");
     }
     else {
         this->player->unschedule("PlayerShooting");

@@ -30,6 +30,9 @@ bool GameScene::init()
     player = Player::create();
     addChild(player);
 
+    raptor = Raptor::create();
+    addChild(raptor);
+
     return true;
 }
 

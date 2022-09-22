@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Player.h"
+#include "Raptor.h"
 
 class GameScene : public cocos2d::Scene
 {
@@ -11,6 +12,7 @@ public:
     virtual bool init();
         
     Player* player;
+    Raptor* raptor;
  
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
