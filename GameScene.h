@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "Player.h"
 #include "Raptor.h"
+#include "Avenger.h"
+#include "Savenger.h"
 
 class GameScene : public cocos2d::Scene
 {
@@ -13,6 +15,7 @@ public:
         
     Player* player;
     Raptor* raptor;
+    Savenger* savenger;
  
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);

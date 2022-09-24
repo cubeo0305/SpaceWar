@@ -33,6 +33,9 @@ bool GameScene::init()
     raptor = Raptor::create();
     addChild(raptor);
 
+    savenger = Savenger::create();
+    addChild(savenger);
+
     return true;
 }
 
