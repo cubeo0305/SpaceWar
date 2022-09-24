@@ -12,9 +12,12 @@ public:
     virtual bool init();
     void update(float dt);
         
+    cocos2d::Vec2 direction;
+    float speed;
     cocos2d::Sprite* raptor;
     void Shooting();
     void SpawnEnemies();
+    void EnemiesMove(bool isStart);
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     

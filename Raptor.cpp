@@ -17,29 +17,26 @@ bool Raptor::init()
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
+
+    this->direction = Vec2(1, 1);
+    this->speed = 200;
     this->raptor = Sprite::create("Enemy4.png");
     addChild(this->raptor);
     this->raptor->setRotation(180);
-    /*this->raptor->setPosition(Vec2(-10,400));
-
-    auto moveto = MoveTo::create(2, Vec2(400, 600));
-    this->raptor->runAction(moveto);*/
-
 
     this->raptor->schedule([&](float dt) {
         this->Shooting();
         }, 1.3 , "RaptorShooting");
 
-    this->SpawnEnemies();
-
+    this->scheduleUpdate();
+    this->EnemiesMove(true);
 
     return true;
 }
 
 void Raptor::update(float dt)
 {
-    
+
 }
 void Raptor::Shooting()
 {
@@ -58,18 +55,38 @@ void Raptor::Shooting()
 }
 void Raptor::SpawnEnemies()
 {
+      
+}
+
+void Raptor::EnemiesMove(bool isStart = false)
+{
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    int positionMaxRand = 100;
-    int positionMinRand = -100;
-    int positionX = rand() % (positionMaxRand - positionMinRand + 1) + positionMinRand;
-    int positionY = rand() % (positionMaxRand - positionMinRand + 1) + positionMinRand;
+    if (isStart)
+    {
+        this->raptor->setPosition(Vec2(visibleSize.width / 2, 900));
+        auto moveDown = MoveTo::create(1, Vec2(visibleSize.width / 2, 650));
+        this->raptor->runAction(Sequence::create(moveDown, CallFunc::create([&]() {
+            EnemiesMove(false);
+            }),nullptr));
+    }
+    else
+    {
+        int positionMax_X = visibleSize.width;
+        int positionMin_X = 0;
+        int positionMax_Y = visibleSize.height;
+        int positionMin_Y = visibleSize.height / 2;
 
-    Vec2 direction = Vec2(positionX, positionY);
-    direction.normalize();
-    const float padding = 100;
-    Vec2 position = direction * (visibleSize.width / 2 + padding) + visibleSize / 2;
+        int positionX = rand() % -(positionMax_X - positionMin_X + 1) + positionMin_X;
+        int positionY = rand() % -(positionMax_Y - positionMin_Y + 1) + positionMin_Y;
 
-    this->raptor->setPosition(Vec2(position));
+        Vec2 position = Vec2(positionX, positionY);
+        auto moveTo = MoveTo::create(2, Vec2(position));
+        auto sequen = Sequence::create(moveTo, CallFunc::create([&]()
+            {
+                EnemiesMove(false);
+            }),nullptr);
+        this->raptor->runAction(sequen);
+    }
 }
