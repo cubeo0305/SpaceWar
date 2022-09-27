@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 
+
 using namespace cocos2d;
 
 class Player : public Node
@@ -11,7 +12,8 @@ public:
     static Player* createPlayer();
     void update(float dt);
     virtual bool init();
-
+    PhysicsBody* body;
+    PhysicsBody* bullet;
     cocos2d::Sprite* player;
 
     cocos2d::Vec2 direction;

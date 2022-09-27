@@ -1,5 +1,5 @@
 #include "Player.h"
-
+#include "Constant.h"
 USING_NS_CC;
 
 Player* Player::createPlayer()
@@ -21,6 +21,10 @@ bool Player::init()
     this->player = Sprite::create("Player.png");
     this->player->setPosition(Vec2(300, 300));
     addChild(this->player);
+
+    this->body->setContactTestBitmask(PLAYER_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(PLAYER_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(PLAYER_COLLISION_BITMASK);
 
     //init Mouse
     auto mouseListener = EventListenerMouse::create();
@@ -73,6 +77,10 @@ void Player::Shooting() {
         });
     auto sequence = Sequence::create(onTop, cleanUp, nullptr);
     bullet->runAction(sequence);
+
+    this->bullet->setContactTestBitmask(PLAYER_BULLET_CONTACT_TEST_BITMASK);
+    this->bullet->setCategoryBitmask(PLAYER_BULLET_CATEGORY_BITMASK);
+    this->bullet->setCollisionBitmask(PLAYER_BULLET_COLLISION_BITMASK);
 
 }
 void Player::setIsShooting(bool isShooting)

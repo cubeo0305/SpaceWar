@@ -1,5 +1,5 @@
 #include "Savenger.h"
-
+#include "Constant.h"
 USING_NS_CC;
 
 Savenger* Savenger::createSavenger()
@@ -18,10 +18,23 @@ bool Savenger::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    this->savenger = Sprite::create("Ememy1.png");
+
+    this->savenger = Sprite::create("Raptor.png");
     this->savenger->setRotation(180);
     addChild(this->savenger);
     this->AvenMove();
+
+    this->savenger->setPosition(Vec2(-50, 650));
+
+    this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
+
+
+    this->schedule([&](float dt)
+        {
+            this->AvenMove();
+        }, 6, "Movement");
     return true;
 }
 
@@ -31,6 +44,11 @@ void Savenger::update(float dt)
 }
 void Savenger::AvenMove()
 {
-    auto MoveDown = MoveBy::create(2, Vec2(0, -700));
-    this->savenger->runAction(MoveDown);
+    auto Point1 = MoveTo::create(1, Vec2(590, 650));
+    auto Point2 = MoveTo::create(1, Vec2(390, 650));
+    auto Point3 = MoveTo::create(1, Vec2(190, 650));
+    auto Point4 = MoveTo::create(1, Vec2(10, 650));
+ 
+    auto sequen = Sequence::create(Point1, Point2, Point3, Point4, Point3, Point2, nullptr);
+    this->savenger->runAction(sequen);
 }

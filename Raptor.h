@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 
+
 using namespace cocos2d;
 
 class Raptor : public Node
@@ -20,7 +21,8 @@ public:
     void EnemiesMove(bool isStart);
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-    
+    PhysicsBody* body;
+    PhysicsBody* bullet;
     // implement the "static create()" method manually
     CREATE_FUNC(Raptor);
 };

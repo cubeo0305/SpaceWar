@@ -12,6 +12,7 @@ public:
 	static Savenger* createSavenger();
 	virtual bool init();
 	cocos2d::Sprite* savenger;
+	PhysicsBody* body;
 	void AvenMove();
 	void update(float dt);
    

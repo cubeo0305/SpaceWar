@@ -1,5 +1,5 @@
 #include "Raptor.h"
-
+#include "Constant.h"
 USING_NS_CC;
 
 Raptor* Raptor::createRaptor()
@@ -24,12 +24,17 @@ bool Raptor::init()
     addChild(this->raptor);
     this->raptor->setRotation(180);
 
+
     this->raptor->schedule([&](float dt) {
         this->Shooting();
         }, 1.3 , "RaptorShooting");
 
     this->scheduleUpdate();
     this->EnemiesMove(true);
+
+    this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
 
     return true;
 }
@@ -52,6 +57,10 @@ void Raptor::Shooting()
         });
     auto sequence = Sequence::create(onBottom, cleanUp, nullptr);
     bullet->runAction(sequence);
+
+    this->bullet->setContactTestBitmask(ENEMY_BULLET_CONTACT_TEST_BITMASK);
+    this->bullet->setCategoryBitmask(ENEMY_BULLET_CATEGORY_BITMASK);
+    this->bullet->setCollisionBitmask(ENEMY_BULLET_COLLISION_BITMASK);
 }
 void Raptor::SpawnEnemies()
 {

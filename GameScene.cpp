@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "GameManager.h"
 
 USING_NS_CC;
 
@@ -19,7 +20,7 @@ bool GameScene::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Scene::init() )
+    if ( !Scene::initWithPhysics() )
     {
         return false;
     }
@@ -30,13 +31,80 @@ bool GameScene::init()
     player = Player::create();
     addChild(player);
 
-    raptor = Raptor::create();
-    addChild(raptor);
-
     savenger = Savenger::create();
     addChild(savenger);
 
+    this->schedule([&](float dt)
+        {
+            this->SpawnEnemies();
+        }, 2, "SpawnEnemies");
+
+
     return true;
+}
+void GameScene::initContactListener()
+{
+    auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin, this);
+    contactListener->onContactSeparate = CC_CALLBACK_1(GameScene::onContactSeparate, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
+}
+bool GameScene::onContactBegin(PhysicsContact& contact)
+{
+    Node* nodeA = contact.getShapeA()->getBody()->getNode();
+    Node* nodeB = contact.getShapeB()->getBody()->getNode();
+
+    if (nodeA && nodeB) {
+        /*nodeA->setColor(Color3B::BLACK);
+        nodeB->setColor(Color3B::BLACK);*/
+
+        /*Entity* entityA = GameManager::findEntity((Sprite*)nodeA);
+        Entity* entityB = GameManager::findEntity((Sprite*)nodeB);
+        float damageA = entityA->getDamage();
+        float damageB = entityB->getDamage();
+        entityA->takeDamage(damageB);
+        entityB->takeDamage(damageA);*/
+    }
+    return true;
+}
+
+void GameScene::onContactSeparate(PhysicsContact& contact) {
+    Node* nodeA = contact.getShapeA()->getBody()->getNode();
+    Node* nodeB = contact.getShapeB()->getBody()->getNode();
+}
+
+void GameScene::SpawnEnemies()
+{
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    int posiXmax = visibleSize.width;
+    int PosiXmin = 0;
+    int posiX = rand() % (posiXmax - PosiXmin + 1) + PosiXmin;
+
+    Vec2 position = Vec2(posiX, 650);
+
+    //random Enemies
+    int intMaxEnemies = 1;
+    int intMinEnemies = 0;
+    int enemyType = rand() % (intMaxEnemies - intMinEnemies + 1) + intMinEnemies;
+
+    //switch (enemyType)
+    //{
+    ///*case Entity::Raptor:
+    //    raptor = Raptor::create();
+    //    addChild(raptor);
+    //    break;*/
+    //case Entity::Savenger:
+    //    savenger = Savenger::create();
+    //    addChild(savenger);
+    //    break;
+    //default:
+    //    savenger = Savenger::create();
+    //    addChild(savenger);
+    //    break;
+    //}
+    //savenger->setPosition(Vec2(position));
 }
 
 void GameScene::menuCloseCallback(Ref* pSender)
