@@ -40,7 +40,7 @@ bool Raptor::init()
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->raptor->getContentSize());
     this->body->setDynamic(false);
-    this->addComponent(this->body);
+    this->raptor->addComponent(this->body);
 
     this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);

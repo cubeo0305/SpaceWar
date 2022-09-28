@@ -19,9 +19,10 @@ bool BulletEnemy::init()
     //Sprite Bullet & Action
     this->bullet = Sprite::create("Bullet.png");
     this->bullet->setContentSize(Size(15, 15));
+    this->bullet->setRotation(180);
     addChild(this->bullet);
 
-    auto onBottom = MoveBy::create(1, Vec2(0, 700));
+    auto onBottom = MoveBy::create(1, Vec2(0, -700));
     auto cleanUp = CallFunc::create([=]() {
         this->bullet->removeFromParentAndCleanup(true);
         });
@@ -31,7 +32,7 @@ bool BulletEnemy::init()
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->bullet->getContentSize());
     this->body->setDynamic(false);
-    this->addComponent(this->body);
+    this->bullet->addComponent(this->body);
 
     this->body->setContactTestBitmask(ENEMY_BULLET_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(ENEMY_BULLET_CATEGORY_BITMASK);

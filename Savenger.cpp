@@ -25,13 +25,13 @@ bool Savenger::init()
     //this->AvenMove();
     //this->savenger->stopAllActions();
 
-    /*this->savenger->setPosition(Vec2(visibleSize.width/2, 650));
-    this->savenger->stopAllActions();*/
+    this->savenger->setPosition(Vec2(-15, 650));
+    
 
-    /*this->schedule([&](float dt)
+    this->schedule([&](float dt)
         {
             this->AvenMove();
-        }, 6, "Movement");*/
+        }, 6, "Movement");
 
     //info Savenger
     this->maxHP = 100;
@@ -40,7 +40,7 @@ bool Savenger::init()
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->savenger->getContentSize());
     this->body->setDynamic(false);
-    this->addComponent(this->body);
+    this->savenger->addComponent(this->body);
 
     this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);

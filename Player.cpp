@@ -42,7 +42,7 @@ bool Player::init()
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->player->getContentSize());
     this->body->setDynamic(false);
-    this->addComponent(this->body);
+    this->player->addComponent(this->body);
      
     this->body->setContactTestBitmask(PLAYER_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(PLAYER_CATEGORY_BITMASK);

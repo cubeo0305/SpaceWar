@@ -31,7 +31,7 @@ bool BulletPlayer::init()
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->bullet->getContentSize());
     this->body->setDynamic(false);
-    this->addComponent(this->body);
+    this->bullet->addComponent(this->body);
 
     this->body->setContactTestBitmask(PLAYER_BULLET_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(PLAYER_BULLET_CATEGORY_BITMASK);

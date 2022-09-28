@@ -39,9 +39,8 @@ bool GameScene::init()
     savenger = Savenger::create();
     addChild(savenger);
 
-    savenger->stopAllActions();
-    savenger->setPosition(Vec2(visibleSize.width / 2, 500));
-    
+    raptor = Raptor::create();
+    addChild(raptor);
 
     return true;
 }
@@ -91,7 +90,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
     if (nodeA && nodeB)
     {
-        CCLOG("1");
+        nodeA->setColor(Color3B::RED);
+        nodeB->setColor(Color3B::RED);
     }
 
     return true;
@@ -100,6 +100,9 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 void GameScene::onContactSeparate(PhysicsContact& contact) {
     Node* nodeA = contact.getShapeA()->getBody()->getNode();
     Node* nodeB = contact.getShapeB()->getBody()->getNode();
+
+    nodeA->setColor(Color3B::WHITE);
+    nodeB->setColor(Color3B::WHITE);
 }
 void GameScene::menuCloseCallback(Ref* pSender)
 {
