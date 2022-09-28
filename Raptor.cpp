@@ -20,10 +20,12 @@ bool Raptor::init()
 
     this->direction = Vec2(1, 1);
     this->speed = 200;
+
     this->raptor = Sprite::create("Enemy4.png");
     addChild(this->raptor);
     this->raptor->setRotation(180);
-
+    this->raptor->setPosition(Vec2(400, 400));
+    this->raptor->stopAllActions();
 
     this->raptor->schedule([&](float dt) {
         this->Shooting();
@@ -31,6 +33,14 @@ bool Raptor::init()
 
     this->scheduleUpdate();
     this->EnemiesMove(true);
+    //info Raptor
+    this->maxHP = 75;
+    this->hp = 75;
+    this->damage = 50;
+    //PhysicsBody
+    this->body = PhysicsBody::createBox(this->raptor->getContentSize());
+    this->body->setDynamic(false);
+    this->addComponent(this->body);
 
     this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
@@ -41,30 +51,24 @@ bool Raptor::init()
 
 void Raptor::update(float dt)
 {
-
+    this->EntityDie();
 }
+
+void Raptor::EntityDie()
+{
+    if (this->hp < 0)
+    {
+        this->raptor->setPosition(Vec2(-100, -100));
+        this->raptor->stopAllActions();
+    }
+}
+
 void Raptor::Shooting()
 {
-    auto bullet = Sprite::create("Bullet.png");
-    bullet->setContentSize(Size(15, 20));
-    bullet->setPosition(this->raptor->getPosition());
-    bullet->setRotation(180);
+    bullet = BulletEnemy::create();
     addChild(bullet);
-
-    auto onBottom = MoveBy::create(1, Vec2(0, -700));
-    auto cleanUp = CallFunc::create([=]() {
-        bullet->removeFromParentAndCleanup(true);
-        });
-    auto sequence = Sequence::create(onBottom, cleanUp, nullptr);
-    bullet->runAction(sequence);
-
-    this->bullet->setContactTestBitmask(ENEMY_BULLET_CONTACT_TEST_BITMASK);
-    this->bullet->setCategoryBitmask(ENEMY_BULLET_CATEGORY_BITMASK);
-    this->bullet->setCollisionBitmask(ENEMY_BULLET_COLLISION_BITMASK);
-}
-void Raptor::SpawnEnemies()
-{
-      
+    bullet->setPosition(Vec2((int)raptor->getPositionX(),
+        (int)raptor->getPositionY() - 15));
 }
 
 void Raptor::EnemiesMove(bool isStart = false)

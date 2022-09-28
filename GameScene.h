@@ -9,6 +9,12 @@
 
 class GameScene : public cocos2d::Scene
 {
+private:
+    PhysicsWorld* world;
+    void setPhysicsWorld(PhysicsWorld* world)
+    {
+        world = world;
+    }
 public:
     static cocos2d::Scene* createScene();
     virtual bool init();
@@ -25,8 +31,8 @@ public:
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     
-    // implement the "static create()" method manually
+    
     CREATE_FUNC(GameScene);
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif // __GAMESCENE_SCENE_H__

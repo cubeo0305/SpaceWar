@@ -1,6 +1,6 @@
 #include "GameScene.h"
 #include "GameManager.h"
-
+#include "Constant.h"
 USING_NS_CC;
 
 Scene* GameScene::createScene()
@@ -31,48 +31,20 @@ bool GameScene::init()
     player = Player::create();
     addChild(player);
 
+    /*this->schedule([&](float dt)
+        {
+            this->SpawnEnemies();
+        }, 2, "SpawnEnemies");*/
+
     savenger = Savenger::create();
     addChild(savenger);
 
-    this->schedule([&](float dt)
-        {
-            this->SpawnEnemies();
-        }, 2, "SpawnEnemies");
-
+    savenger->stopAllActions();
+    savenger->setPosition(Vec2(visibleSize.width / 2, 500));
+    
 
     return true;
 }
-void GameScene::initContactListener()
-{
-    auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin, this);
-    contactListener->onContactSeparate = CC_CALLBACK_1(GameScene::onContactSeparate, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
-}
-bool GameScene::onContactBegin(PhysicsContact& contact)
-{
-    Node* nodeA = contact.getShapeA()->getBody()->getNode();
-    Node* nodeB = contact.getShapeB()->getBody()->getNode();
-
-    if (nodeA && nodeB) {
-        /*nodeA->setColor(Color3B::BLACK);
-        nodeB->setColor(Color3B::BLACK);*/
-
-        /*Entity* entityA = GameManager::findEntity((Sprite*)nodeA);
-        Entity* entityB = GameManager::findEntity((Sprite*)nodeB);
-        float damageA = entityA->getDamage();
-        float damageB = entityB->getDamage();
-        entityA->takeDamage(damageB);
-        entityB->takeDamage(damageA);*/
-    }
-    return true;
-}
-
-void GameScene::onContactSeparate(PhysicsContact& contact) {
-    Node* nodeA = contact.getShapeA()->getBody()->getNode();
-    Node* nodeB = contact.getShapeB()->getBody()->getNode();
-}
-
 void GameScene::SpawnEnemies()
 {
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -89,24 +61,46 @@ void GameScene::SpawnEnemies()
     int intMinEnemies = 0;
     int enemyType = rand() % (intMaxEnemies - intMinEnemies + 1) + intMinEnemies;
 
-    //switch (enemyType)
-    //{
-    ///*case Entity::Raptor:
-    //    raptor = Raptor::create();
-    //    addChild(raptor);
-    //    break;*/
-    //case Entity::Savenger:
-    //    savenger = Savenger::create();
-    //    addChild(savenger);
-    //    break;
-    //default:
-    //    savenger = Savenger::create();
-    //    addChild(savenger);
-    //    break;
-    //}
-    //savenger->setPosition(Vec2(position));
+    /*switch (enemyType)
+    {
+    case Entity::Raptor:
+        raptor = Raptor::create();
+        addChild(raptor);
+        break;
+    case Entity::Savenger:
+        savenger = Savenger::create();
+        addChild(savenger);
+        break;
+    default:
+        savenger = Savenger::create();
+        addChild(savenger);
+        break;
+    }
+    savenger->setPosition(Vec2(position));*/
+}
+void GameScene::initContactListener() {
+    auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin, this);
+    contactListener->onContactSeparate = CC_CALLBACK_1(GameScene::onContactSeparate, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
 }
 
+bool GameScene::onContactBegin(PhysicsContact& contact) {
+    Node* nodeA = contact.getShapeA()->getBody()->getNode();
+    Node* nodeB = contact.getShapeB()->getBody()->getNode();
+
+    if (nodeA && nodeB)
+    {
+        CCLOG("1");
+    }
+
+    return true;
+}
+
+void GameScene::onContactSeparate(PhysicsContact& contact) {
+    Node* nodeA = contact.getShapeA()->getBody()->getNode();
+    Node* nodeB = contact.getShapeB()->getBody()->getNode();
+}
 void GameScene::menuCloseCallback(Ref* pSender)
 {
     Director::getInstance()->end();

@@ -2,20 +2,21 @@
 #define __Savenger_SCENE_H__
 
 #include "cocos2d.h"
-
+#include "Entity.h"
 using namespace cocos2d;
 
-class Savenger : public Node
+class Savenger : public Node , public Entity
 {
 private:
 public:
 	static Savenger* createSavenger();
 	virtual bool init();
-	cocos2d::Sprite* savenger;
+
 	PhysicsBody* body;
+	cocos2d::Sprite* savenger;
 	void AvenMove();
 	void update(float dt);
-   
+	void EntityDie();
     CREATE_FUNC(Savenger);
 };
 

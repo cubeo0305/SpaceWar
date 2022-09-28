@@ -21,11 +21,6 @@ bool Player::init()
     this->player = Sprite::create("Player.png");
     this->player->setPosition(Vec2(300, 300));
     addChild(this->player);
-
-    this->body->setContactTestBitmask(PLAYER_CONTACT_TEST_BITMASK);
-    this->body->setCategoryBitmask(PLAYER_CATEGORY_BITMASK);
-    this->body->setCollisionBitmask(PLAYER_COLLISION_BITMASK);
-
     //init Mouse
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(Player::onMouseDown, this);
@@ -38,6 +33,20 @@ bool Player::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(lis, this);
 
     this->scheduleUpdate();
+
+    //set Hp, damage
+    this->maxHP = 100;
+    this->hp = 100;
+    this->damage = 35;
+
+    //PhysicsBody
+    this->body = PhysicsBody::createBox(this->player->getContentSize());
+    this->body->setDynamic(false);
+    this->addComponent(this->body);
+     
+    this->body->setContactTestBitmask(PLAYER_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(PLAYER_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(PLAYER_COLLISION_BITMASK);
 
     return true;
 }
@@ -64,24 +73,12 @@ void Player::onMouseDown(Event* event) {
 
     this->setIsShooting(true);
 }
-void Player::Shooting() {
-    // create bullet at sprite position and aim to targetPos
-    auto bullet = Sprite::create("Bullet.png");
-    bullet->setContentSize(Size(15, 20));
-    bullet->setPosition(this->player->getPosition());
+void Player::Shooting() 
+{
+    bullet = BulletPlayer::create();
     addChild(bullet);
-
-    auto onTop = MoveBy::create(1, Vec2(0, 700));
-    auto cleanUp = CallFunc::create([=]() {
-        bullet->removeFromParentAndCleanup(true);
-        });
-    auto sequence = Sequence::create(onTop, cleanUp, nullptr);
-    bullet->runAction(sequence);
-
-    this->bullet->setContactTestBitmask(PLAYER_BULLET_CONTACT_TEST_BITMASK);
-    this->bullet->setCategoryBitmask(PLAYER_BULLET_CATEGORY_BITMASK);
-    this->bullet->setCollisionBitmask(PLAYER_BULLET_COLLISION_BITMASK);
-
+    bullet->setPosition(Vec2((int)player->getPositionX(),
+                             (int)player->getPositionY() + 15));
 }
 void Player::setIsShooting(bool isShooting)
 {

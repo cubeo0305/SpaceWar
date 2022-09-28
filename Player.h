@@ -2,20 +2,20 @@
 #define __Player_SCENE_H__
 
 #include "cocos2d.h"
-
+#include "Entity.h"
+#include "BulletPlayer.h"
 
 using namespace cocos2d;
 
-class Player : public Node
+class Player : public Node , public Entity
 {
 public:
     static Player* createPlayer();
+    BulletPlayer* bullet;
     void update(float dt);
     virtual bool init();
-    PhysicsBody* body;
-    PhysicsBody* bullet;
     cocos2d::Sprite* player;
-
+    PhysicsBody* body;
     cocos2d::Vec2 direction;
 
     void onMouseDown(cocos2d::Event* event);

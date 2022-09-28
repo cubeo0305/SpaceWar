@@ -17,9 +17,7 @@ static void problemLoading(const char* filename)
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
-    //////////////////////////////
-    // 1. super init first
-    if ( !Scene::init() )
+    if (!Scene::initWithPhysics())
     {
         return false;
     }
@@ -27,10 +25,84 @@ bool HelloWorld::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    this->Player = Sprite::create("HelloWorld.png");
-    addChild(this->Player);
+    this->mySprite = Sprite::create("Player.png");
+    addChild(this->mySprite);
+    this->mySprite->setPosition(Vec2(50, 50));
+
+
+    this->mySprite2 = Sprite::create("Player.png");
+    addChild(this->mySprite2);
+    this->mySprite2->setPosition(Vec2(300, 200));
+
+    // Init mouse event listener
+    auto mouseListener = EventListenerMouse::create();
+    mouseListener->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+
+
+    this->initContactListener();
+    this->scheduleUpdate();
 
     return true;
+}
+void HelloWorld::onMouseDown(Event* event) {
+    EventMouse* e = (EventMouse*)event;
+
+    Vec2 location = e->getLocationInView();
+
+    auto moveTo = MoveTo::create(1, location);
+    this->mySprite->stopAllActions();
+    this->mySprite->runAction(moveTo);
+}
+void HelloWorld::update(float dt)
+{
+
+}
+void HelloWorld::initContactListener() {
+    auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = [](PhysicsContact& contact) {
+        Node* nodeA = contact.getShapeA()->getBody()->getNode();
+        Node* nodeB = contact.getShapeB()->getBody()->getNode();
+
+        if (nodeA && nodeB) {
+            if (nodeA->getTag() == 10) {
+                nodeB->setColor(Color3B::RED);
+            }
+            else if (nodeB->getTag() == 10) {
+                nodeA->setColor(Color3B::RED);
+            }
+        }
+        return true;
+    };
+    contactListener->onContactSeparate = CC_CALLBACK_1(HelloWorld::onContactSeparate, this);
+
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
+
+    // init physic body
+    auto physicsBody = PhysicsBody::createCircle(this->mySprite->getContentSize().width / 2);
+    physicsBody->setDynamic(false);
+    physicsBody->setContactTestBitmask(0x01); //0001
+    physicsBody->setCategoryBitmask(0x01); // 0001
+    physicsBody->setCollisionBitmask(0x01); // 0001
+    this->mySprite->addComponent(physicsBody);
+    this->mySprite->setTag(10); // identity for mySprite
+
+    auto physicsBody2 = PhysicsBody::createCircle(this->mySprite2->getContentSize().width / 2);
+    physicsBody2->setDynamic(false);
+    physicsBody2->setContactTestBitmask(0x01); // 0010 
+    physicsBody2->setCategoryBitmask(0x03); // 0011
+    physicsBody2->setCollisionBitmask(0x01); // 0001
+    this->mySprite2->addComponent(physicsBody2);
+    this->mySprite2->setTag(1); //identity for mySprite2
+}
+void HelloWorld::onContactSeparate(PhysicsContact& contact) {
+    Node* nodeA = contact.getShapeA()->getBody()->getNode();
+    Node* nodeB = contact.getShapeB()->getBody()->getNode();
+
+    if (nodeA && nodeB) {
+        nodeA->setColor(Color3B::WHITE);
+        nodeB->setColor(Color3B(255, 255, 255));
+    }
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender)

@@ -1,5 +1,3 @@
-
-
 #ifndef __ENTIIY_SCENE_H__
 #define __ENTIIY_SCENE_H__
 
@@ -12,17 +10,26 @@ class Entity
 {
 public: 
     Sprite* sprite;
+    int healthEnemy;
+    float maxHP;
+    float hp;
+    float damage;
 
     Entity();
     Entity(const string& file);
     ~Entity();
-
-    PhysicsBody* body;
-
     enum Enemies {
         Raptor,
         Savenger
     };
+    
+    virtual float getMaxHP();
+    virtual void setMaxHP(float hp);
+    virtual int getHealthEnemy();
+    virtual void setHealthEnemy(float hp);
+    virtual float getDamage();
+    virtual void setDamage(float damage);
+    virtual void TakeDamage(float damage);
 };
 
 #endif // __Entity_SCENE_H__

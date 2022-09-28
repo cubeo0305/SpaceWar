@@ -22,25 +22,38 @@ bool Savenger::init()
     this->savenger = Sprite::create("Raptor.png");
     this->savenger->setRotation(180);
     addChild(this->savenger);
-    this->AvenMove();
+    //this->AvenMove();
+    //this->savenger->stopAllActions();
 
-    this->savenger->setPosition(Vec2(-50, 650));
+    /*this->savenger->setPosition(Vec2(visibleSize.width/2, 650));
+    this->savenger->stopAllActions();*/
+
+    /*this->schedule([&](float dt)
+        {
+            this->AvenMove();
+        }, 6, "Movement");*/
+
+    //info Savenger
+    this->maxHP = 100;
+    this->hp = 100;
+    this->damage = 100;
+    //PhysicsBody
+    this->body = PhysicsBody::createBox(this->savenger->getContentSize());
+    this->body->setDynamic(false);
+    this->addComponent(this->body);
 
     this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
     this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
     this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
+    
+    this->scheduleUpdate();
 
-
-    this->schedule([&](float dt)
-        {
-            this->AvenMove();
-        }, 6, "Movement");
     return true;
 }
 
 void Savenger::update(float dt)
 {
-
+    this->EntityDie();
 }
 void Savenger::AvenMove()
 {
@@ -51,4 +64,13 @@ void Savenger::AvenMove()
  
     auto sequen = Sequence::create(Point1, Point2, Point3, Point4, Point3, Point2, nullptr);
     this->savenger->runAction(sequen);
+
+}
+void Savenger::EntityDie()
+{
+    if (this->hp < 0)
+    {
+        savenger->setPosition(Vec2(-100, -100));
+        savenger->stopAllActions();
+    }
 }
