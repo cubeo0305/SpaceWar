@@ -1,6 +1,4 @@
 #include "Player.h"
-#include "GameManager.h"
-#include "Constant.h"
 USING_NS_CC;
 
 Player* Player::createPlayer()
@@ -22,30 +20,6 @@ bool Player::init()
     this->player = Sprite::create("Player.png");
     this->player->setPosition(Vec2(300, 300));
     addChild(this->player);
-    
-    this->initEventListener();
-    this->scheduleUpdate();
-
-    //set Hp, damage
-    this->setMaxHP(100);
-    this->setHP(100);
-    this->maxHP = 100;
-    this->hp = 100;
-    this->damage = 35;
-
-    //PhysicsBody
-    this->body = PhysicsBody::createBox(this->player->getContentSize());
-    this->body->setDynamic(false);
-    this->player->addComponent(this->body);
-     
-    this->body->setContactTestBitmask(PLAYER_CONTACT_TEST_BITMASK);
-    this->body->setCategoryBitmask(PLAYER_CATEGORY_BITMASK);
-    this->body->setCollisionBitmask(PLAYER_COLLISION_BITMASK);
-
-    return true;
-}
-void Player::initEventListener()
-{
     //init Mouse
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(Player::onMouseDown, this);
@@ -56,25 +30,20 @@ void Player::initEventListener()
     lis->onKeyPressed = CC_CALLBACK_2(Player::onKeyPressed, this);
     lis->onKeyReleased = CC_CALLBACK_2(Player::onKeyReleased, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(lis, this);
-}
-int Player::getHeart() {
-    return this->heart;
-}
 
-void Player::setHeart(int heart) {
-    this->heart = heart;
-}
-void Player::takeDamage(float damage) {
-    this->hp -= damage;
-    if (this->hp <= 0) {
-        if (this->heart > 0) {
-            this->heart--;
-            this->hp = this->maxHP;
-        }
-        else {
-            this->hp = 0;
-        }
-    }
+    this->scheduleUpdate();
+
+
+    //PhysicsBody
+    this->body = PhysicsBody::createBox(this->player->getContentSize());
+    this->body->setDynamic(false);
+    this->body->setContactTestBitmask(true);
+    this->body->setCollisionBitmask(10);
+    this->player->addComponent(this->body);
+     
+   
+
+    return true;
 }
 
 void Player::update(float dt)
@@ -115,7 +84,7 @@ void Player::setIsShooting(bool isShooting)
         // Schedule shooting
         this->player->schedule([&](float dt) {
             this->Shooting();
-            }, 0.3, "PlayerShooting");
+            }, 0.1, "PlayerShooting");
     }
     else {
         this->player->unschedule("PlayerShooting");

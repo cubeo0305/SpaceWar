@@ -2,12 +2,12 @@
 #define __RAPTOR_SCENE_H__
 
 #include "cocos2d.h"
-#include "Entity.h"
+#include "Enemy.h"
 #include "BulletEnemy.h"
 
 using namespace cocos2d;
 
-class Raptor : public Node , public Entity
+class Raptor : public Enemy
 {
 public:
     static Raptor* createRaptor();
@@ -23,10 +23,12 @@ public:
     PhysicsBody* body;
     void Shooting();
     void EnemiesMove(bool isStart);
+
+    int getHealthEnemy();
+    void setHealthEnemy();
     
-    // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
-    // implement the "static create()" method manually
+    void EntityDie();
+
     CREATE_FUNC(Raptor);
 };
 

@@ -1,5 +1,4 @@
 #include "Savenger.h"
-#include "Constant.h"
 USING_NS_CC;
 
 Savenger* Savenger::createSavenger()
@@ -14,30 +13,32 @@ bool Savenger::init()
     {
         return false;
     }
+
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    this->maxHP = 1;
+    this->healthEnemy = this->maxHP;
+
     this->savenger = Sprite::create("Raptor.png");
     this->savenger->setRotation(180);
-    this->savenger->setPosition(Vec2(-15, 650));
     addChild(this->savenger);
 
-    this->schedule([&](float dt)
+    //this->savenger->setPosition(Vec2(-15, 650));
+    this->savenger->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+
+    /*this->schedule([&](float dt)
         {
             this->AvenMove();
-        }, 6, "Movement");
-
-    //info Savenger
-    this->maxHP = 100;
-    this->hp = 100;
-    this->damage = 100;
+        }, 6, "Movement");*/
 
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->savenger->getContentSize());
     this->body->setDynamic(false);
+    this->body->setContactTestBitmask(true);
+    this->body->setCollisionBitmask(20);
     this->savenger->addComponent(this->body);
 
-    this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
-    this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
-    this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
-    
     this->scheduleUpdate();
 
     return true;
@@ -45,7 +46,15 @@ bool Savenger::init()
 
 void Savenger::update(float dt)
 {
-    
+    this->EntityDie();
+}
+int Savenger::getHealthEnemy()
+{
+    return this->maxHP;
+}
+void Savenger::setHealthEnemy()
+{
+    this->healthEnemy -= 25;
 }
 void Savenger::AvenMove()
 {
@@ -57,4 +66,14 @@ void Savenger::AvenMove()
     auto sequen = Sequence::create(Point1, Point2, Point3, Point4, Point3, Point2, nullptr);
     this->savenger->runAction(sequen);
 
+}
+void Savenger::EntityDie()
+{
+    if (this->healthEnemy <= 0)
+    {
+        auto newPos = Vec2(-10, -10);
+        this->savenger->setPosition(newPos);
+        this->savenger->stopAllActions();
+        this->savenger->unschedule("Movement");
+    }
 }

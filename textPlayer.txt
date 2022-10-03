@@ -22,3 +22,11 @@ Boss
 	Damage = 25
 	attackSpeed = 3s/6 hit
 }
+
+
+
+player = 10
+player bullet = 15;
+
+Enemy =20
+Enemy bullet = 25

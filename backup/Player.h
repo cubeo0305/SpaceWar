@@ -1,22 +1,14 @@
-#ifndef __Player_H__
-#define __Player_H__
+#ifndef __Player_SCENE_H__
+#define __Player_SCENE_H__
 
 #include "cocos2d.h"
-#include "Entity.h"
 #include "BulletPlayer.h"
 
 using namespace cocos2d;
 
-class Player : public Node , public Entity
+class Player : public Node 
 {
-private:
-    int heart;
-    void initEventListener();
 public:
-    int getHeart();
-    void setHeart(int heart);
-    void takeDamage(float damage);
-
     static Player* createPlayer();
     BulletPlayer* bullet;
     void update(float dt);

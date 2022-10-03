@@ -1,33 +1,63 @@
 #include "GameManager.h"
+#include "Entity.h"
+#include "Player.h"
+#include "Raptor.h"
+#include "Savenger.h"
 
 USING_NS_CC;
 
-Scene* GameManager::createScene()
-{
-    return GameManager::create();
+Scene* GameManager::world = NULL;
+std::vector<Entity*> GameManager::enemies;
+std::vector<Entity*> GameManager::entities;
+
+GameManager::GameManager() {
 }
 
-// Print useful error message instead of segfaulting when files are not there.
-static void problemLoading(const char* filename)
-{
-    printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
+GameManager::~GameManager() {
+
+}
+void GameManager::setWorld(Scene* world) {
+	GameManager::world = world;
 }
 
-// on "init" you need to initialize your instance
+Scene* GameManager::getWorld() {
+	return GameManager::world;
+}
+
 bool GameManager::init()
 {
-    //////////////////////////////
-    // 1. super init first
-    if ( !Scene::init() )
-    {
-        return false;
-    }
-
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     return true;
+}
+Entity* GameManager::findEntity(Sprite* sprite) {
+	for (Entity* entity : entities) {
+		if (entity != NULL) {
+			if (entity->getSprite() == sprite) return entity;
+		}
+	}
+
+	return NULL;
+}
+void GameManager::destroyEntity(Entity* entity) {
+	auto _entity = std::find(entities.begin(), entities.end(), entity);
+	auto _enemy = std::find(enemies.begin(), enemies.end(), entity);
+
+	/*std::remove(entities.begin(), entities.end(), entity);
+	std::remove(enemies.begin(), enemies.end(), entity);*/
+	entity->destroy();
+	delete entity;
+
+	if (_entity != entities.end()) (*_entity) = NULL;
+	if (_enemy != enemies.end()) (*_enemy) = NULL;
+}
+void GameManager::addEntity(Entity* entity) {
+	auto foundEntity = std::find(entities.begin(), entities.end(), entity);
+	if (foundEntity == entities.end()) {
+		world->addChild(entity->getSprite());
+		entities.push_back(entity);
+	}
 }
 
 void GameManager::Start()
@@ -38,34 +68,5 @@ void GameManager::Start()
 
 void GameManager::SpawnEnemies()
 {
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    int posiXmax = visibleSize.width;
-    int PosiXmin = 0;
-    int posiX = rand() % (posiXmax - PosiXmin + 1) + PosiXmin;
-
-    Vec2 position = Vec2(posiX, 650);
-
-    //random Enemies
-    int intMaxEnemies = 1;
-    int intMinEnemies = 0;
-    int enemyType = rand() % (intMaxEnemies - intMinEnemies + 1) + intMinEnemies;
-
-    switch (enemyType)
-    {
-    case Entity::Raptor:
-        raptor = Raptor::create();
-        addChild(raptor);
-        break;
-    case Entity::Savenger:
-        savenger = Savenger::create();
-        addChild(savenger);
-        break;
-    default:
-        savenger = Savenger::create();
-        addChild(savenger);
-        break;
-    }
-    savenger->setPosition(Vec2(position));
 }

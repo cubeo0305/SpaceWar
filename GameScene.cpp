@@ -42,6 +42,8 @@ bool GameScene::init()
     raptor = Raptor::create();
     addChild(raptor);
 
+    this->initContactListener();
+
     return true;
 }
 void GameScene::SpawnEnemies()
@@ -90,8 +92,12 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
     if (nodeA && nodeB)
     {
-        nodeA->setColor(Color3B::RED);
-        nodeB->setColor(Color3B::RED);
+        Entity* entityA = GameManager::findEntity((Sprite*)nodeA);
+        Entity* entityB = GameManager::findEntity((Sprite*)nodeB);
+        float damageA = entityA->getDamage();
+        float damageB = entityB->getDamage();
+        entityA->TakeDamage(damageB);
+        entityB->TakeDamage(damageA);
     }
 
     return true;
@@ -100,9 +106,6 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 void GameScene::onContactSeparate(PhysicsContact& contact) {
     Node* nodeA = contact.getShapeA()->getBody()->getNode();
     Node* nodeB = contact.getShapeB()->getBody()->getNode();
-
-    nodeA->setColor(Color3B::WHITE);
-    nodeB->setColor(Color3B::WHITE);
 }
 void GameScene::menuCloseCallback(Ref* pSender)
 {
