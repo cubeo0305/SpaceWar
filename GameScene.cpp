@@ -28,13 +28,28 @@ bool GameScene::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
+    //background
+    auto background = Sprite::create("space.png");
+    background->setPosition(Vec2(0,0));
+    background->setAnchorPoint(Vec2(0,0));
+    background->setContentSize(Size(visibleSize.width,visibleSize.height));
+    addChild(background);
+
+    auto Ring = Sprite::create("ring.png");
+    Ring->setAnchorPoint(Vec2(0, 0));
+    Ring->setPosition(Vec2(0,770));
+    Ring->setRotation(90);
+    Ring->setScale(5);
+    addChild(Ring);
+
+    //player add
     player = Player::create();
     addChild(player);
 
-    /*this->schedule([&](float dt)
+    this->schedule([&](float dt)
         {
             this->SpawnEnemies();
-        }, 2, "SpawnEnemies");*/
+        }, 2, "SpawnEnemies");
 
     savenger = Savenger::create();
     addChild(savenger);
@@ -62,22 +77,26 @@ void GameScene::SpawnEnemies()
     int intMinEnemies = 0;
     int enemyType = rand() % (intMaxEnemies - intMinEnemies + 1) + intMinEnemies;
 
-    /*switch (enemyType)
+    switch (enemyType)
     {
-    case Entity::Raptor:
+    /*case Entity::Raptor:
         raptor = Raptor::create();
         addChild(raptor);
         break;
     case Entity::Savenger:
         savenger = Savenger::create();
         addChild(savenger);
-        break;
+        break;*/
+    /*case Entity::Asteroid:
+        asteroid = Asteroid::create();
+        addChild(asteroid);
+        break;*/
     default:
-        savenger = Savenger::create();
-        addChild(savenger);
+        asteroid = Asteroid::create();
+        addChild(asteroid);
         break;
     }
-    savenger->setPosition(Vec2(position));*/
+    //asteroid->setPosition(Vec2(position));
 }
 void GameScene::initContactListener() {
     auto contactListener = EventListenerPhysicsContact::create();

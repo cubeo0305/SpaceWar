@@ -21,15 +21,16 @@ bool Raptor::init()
     this->direction = Vec2(1, 1);
     this->speed = 200;
 
-    this->raptor = Sprite::create("Enemy4.png");
+    this->raptor = Sprite::create("Viper.png");
     addChild(this->raptor);
-    this->raptor->setRotation(180);
+    this->raptor->setScale(2);
+    //this->raptor->setRotation(180);
     this->raptor->setPosition(Vec2(400, 400));
     this->raptor->stopAllActions();
 
     this->raptor->schedule([&](float dt) {
         this->Shooting();
-        }, 1.3 , "RaptorShooting");
+        }, 2 , "RaptorShooting");
 
     this->scheduleUpdate();
     this->EnemiesMove(true);

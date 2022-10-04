@@ -19,13 +19,26 @@ bool Player::init()
     this->speed = 200;
     this->direction = Vec2(1, 1);
 
-    this->player = Sprite::create("Player.png");
+    this->player = Sprite::create("ship.png");
     this->player->setPosition(Vec2(300, 300));
+    this->player->setScale(1.3);
     addChild(this->player);
     
+
+    /*SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ship.plist","playship.png");
+    this->player = Sprite::createWithSpriteFrameName("tile001.png");
+    addChild(this->player);
+    Animate* animationShip = Animate::create(Player::createAnimation("tile00", 10, -0.008f));
+    this->player->setPosition(Vec2(300, 300));
+    player->runAction(RepeatForever::create(animationShip));
+    this->player->setScale(3);*/
+
+    
+
+    //this->initAnimation();
     this->initEventListener();
     this->scheduleUpdate();
-
+    
     //set Hp, damage
     this->setMaxHP(100);
     this->setHP(100);
@@ -44,6 +57,33 @@ bool Player::init()
 
     return true;
 }
+//void Player::initAnimation()
+//{
+//    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ship.plist");
+//
+//    this->player = Sprite::createWithSpriteFrameName("tile000.png");
+//    this->player->setPosition(Vec2(300, 300));
+//    addChild(this->player);
+//
+//    this->animation = Player::createAnimation("playship", 10, 0.1);
+//    auto animate = Animate::create(this->animation);
+//    this->player->runAction(RepeatForever::create(animate));
+//}
+//Animation* Player::createAnimation(string prefixName, int pFramesOrder, float deplay)
+//{
+//    Vector<SpriteFrame*>animFrames;
+//    for (int i = 0; i <= pFramesOrder; i++)
+//    {
+//        char buffer[20] = { 0 };
+//        sprintf(buffer, "(%d).png", i);
+//        string imgName = prefixName + buffer;
+//        auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(imgName);
+//        animFrames.pushBack(frame);
+//    }
+//    auto animation = Animation::createWithSpriteFrames(animFrames, deplay);
+//    
+//    return animation;
+//}
 void Player::initEventListener()
 {
     //init Mouse

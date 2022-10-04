@@ -59,7 +59,7 @@ Sprite* Entity::getSprite() {
 	return this->sprite;
 }
 void Entity::destroy() {
-	//this->sprite->removeFromParentAndCleanup(true);
-	this->sprite->setPosition(Vec2(-100, -100));
-	this->sprite->stopAllActions();
+	this->sprite->removeFromParentAndCleanup(true);
+	/*this->sprite->setPosition(Vec2(-100, -100));
+	this->sprite->stopAllActions();*/
 }

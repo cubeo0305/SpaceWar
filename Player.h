@@ -34,6 +34,11 @@ public:
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
+    //Animation
+    /*cocos2d::Animation* animation;
+    Animation* createAnimation(string prefixName, int pFramesOrder, float deplay);
+    void initAnimation();*/
+
     bool isKeyDown = false;
     float speed;
 

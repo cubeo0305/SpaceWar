@@ -17,8 +17,8 @@ bool BulletPlayer::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     //Sprite Bullet & Action
-    this->bullet = Sprite::create("Bullet.png");
-    this->bullet->setContentSize(Size(15, 15));
+    this->bullet = Sprite::create("bred1.png");
+    this->bullet->setScale(1);
     addChild(this->bullet);
 
     auto onBottom = MoveBy::create(1, Vec2(0, 700));

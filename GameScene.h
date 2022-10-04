@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Raptor.h"
 #include "Savenger.h"
+#include "Asteroid.h"
 #include "Entity.h"
 
 class GameScene : public cocos2d::Scene
@@ -22,6 +23,7 @@ public:
     Player* player;
     Raptor* raptor;
     Savenger* savenger;
+    Asteroid* asteroid;
 
     bool onContactBegin(PhysicsContact& contact);
     void onContactSeparate(PhysicsContact& contact);

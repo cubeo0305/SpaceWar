@@ -14,9 +14,10 @@ bool Savenger::init()
     {
         return false;
     }
-    this->savenger = Sprite::create("Raptor.png");
+    this->savenger = Sprite::create("Savenger.png");
     this->savenger->setRotation(180);
-    this->savenger->setPosition(Vec2(-15, 650));
+    this->savenger->setPosition(Vec2(-30, 650));
+    this->savenger->setScale(2);
     addChild(this->savenger);
 
     this->schedule([&](float dt)
@@ -56,5 +57,4 @@ void Savenger::AvenMove()
  
     auto sequen = Sequence::create(Point1, Point2, Point3, Point4, Point3, Point2, nullptr);
     this->savenger->runAction(sequen);
-
 }
