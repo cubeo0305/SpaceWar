@@ -6,38 +6,33 @@
 #include "Raptor.h"
 #include "Savenger.h"
 #include "Asteroid.h"
-#include "Boss.h"
-#include "Enemy.h"
+#include "Entity.h"
 
 class GameScene : public cocos2d::Scene
 {
 private:
     PhysicsWorld* world;
-    void setPhysicsWorld(PhysicsWorld* _world)
+    void setPhysicsWorld(PhysicsWorld* world)
     {
-        world = _world;
+        world = world;
     }
-    
 public:
     static cocos2d::Scene* createScene();
     virtual bool init();
-    float Wave;
-
+    
     Player* player;
     Raptor* raptor;
     Savenger* savenger;
     Asteroid* asteroid;
-    Boss* boss;
 
-    cocos2d::Sprite* planet;
-    void ActionPlane();
     bool onContactBegin(PhysicsContact& contact);
-    void WaveEnemies();
+    void onContactSeparate(PhysicsContact& contact);
     void initContactListener();
 
     void SpawnEnemies();
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
+    
     
     CREATE_FUNC(GameScene);
 };

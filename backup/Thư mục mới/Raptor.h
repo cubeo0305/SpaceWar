@@ -2,20 +2,18 @@
 #define __RAPTOR_SCENE_H__
 
 #include "cocos2d.h"
-#include "Enemy.h"
+#include "Entity.h"
 #include "BulletEnemy.h"
 
 using namespace cocos2d;
 
-class Raptor : public Enemy
+class Raptor : public Node , public Entity
 {
 public:
     static Raptor* createRaptor();
     virtual bool init();
     void update(float dt);
-    
-    float maxHP;
-
+        
     BulletEnemy* bullet;
 
     cocos2d::Vec2 direction;
@@ -25,11 +23,10 @@ public:
     PhysicsBody* body;
     void Shooting();
     void EnemiesMove(bool isStart);
-    void RaptorMove();
-
-    int getHealthEnemy();
-    void setHealthEnemy();
-
+    
+    // a selector callback
+    void menuCloseCallback(cocos2d::Ref* pSender);
+    // implement the "static create()" method manually
     CREATE_FUNC(Raptor);
 };
 

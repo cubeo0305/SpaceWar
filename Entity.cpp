@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include "GameManager.h"
+
 USING_NS_CC;
 
 Entity::Entity()
@@ -16,50 +16,34 @@ Entity::~Entity()
 {
 
 }
-void Entity::init()
+void Entity::setHealthEnemy(float hp)
 {
-	this->maxHP = 0;
-	this->hp = 0;
-	this->damage = 0;
+	this->healthEnemy = hp;
+}
+int Entity::getHealthEnemy()
+{
+	return this->healthEnemy;
 }
 
-float Entity::getHP() {
-	return this->hp;
-}
-
-void Entity::setHP(float hp) {
-	this->hp = hp;
+void Entity::setMaxHP(float maxHP)
+{
+	this->maxHP = maxHP;
 }
 float Entity::getMaxHP()
 {
 	return this->maxHP;
 }
-void Entity::setMaxHP(float maxHP)
+
+void Entity::setDamage(float damage)
 {
-	this->maxHP = maxHP;
+	this->damage = damage;
 }
-float Entity::getDamage() {
+float Entity::getDamage()
+{
 	return this->damage;
 }
 
-void Entity::setDamage(float damage) {
-	this->damage = damage;
-}
-
-void Entity::TakeDamage(float damage) {
+void Entity::TakeDamage(float damage)
+{
 	this->hp -= damage;
-
-	if (this->hp <= 0) {
-		this->hp = 0;
-		
-		GameManager::destroyEntity(this);
-	}
-}
-Sprite* Entity::getSprite() {
-	return this->sprite;
-}
-void Entity::destroy() {
-	this->sprite->removeFromParentAndCleanup(true);
-	/*this->sprite->setPosition(Vec2(-100, -100));
-	this->sprite->stopAllActions();*/
 }

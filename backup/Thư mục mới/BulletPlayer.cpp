@@ -1,4 +1,5 @@
 #include "BulletPlayer.h"
+#include "Constant.h"
 USING_NS_CC;
 
 BulletPlayer* BulletPlayer::createBullet()
@@ -16,12 +17,11 @@ bool BulletPlayer::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     //Sprite Bullet & Action
-    this->bullet = Sprite::create("bred2.png");
-    //this->bullet->setContentSize(Size(30, 30));
-    this->bullet->setScale(1.5);
+    this->bullet = Sprite::create("bred1.png");
+    this->bullet->setScale(1);
     addChild(this->bullet);
 
-    auto onBottom = MoveBy::create(1, Vec2(0, 810));
+    auto onBottom = MoveBy::create(1, Vec2(0, 700));
     auto cleanUp = CallFunc::create([=]() {
         this->bullet->removeFromParentAndCleanup(true);
         });
@@ -29,11 +29,14 @@ bool BulletPlayer::init()
     this->bullet->runAction(sequence);
 
     //PhysicsBody
-    this->body = PhysicsBody::createCircle(this->bullet->getContentSize().width/4);
+    this->body = PhysicsBody::createBox(this->bullet->getContentSize());
     this->body->setDynamic(false);
-    this->body->setContactTestBitmask(true);
-    this->body->setCollisionBitmask(15);
     this->bullet->addComponent(this->body);
+
+    this->body->setContactTestBitmask(PLAYER_BULLET_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(PLAYER_BULLET_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(PLAYER_BULLET_COLLISION_BITMASK);
+
     return true;
 }
 

@@ -1,22 +1,21 @@
-#ifndef __Player_H__
-#define __Player_H__
+#ifndef __Player_SCENE_H__
+#define __Player_SCENE_H__
 
 #include "cocos2d.h"
-#include "Entity.h"
 #include "BulletPlayer.h"
 
 using namespace cocos2d;
+using namespace std;
 
-class Player : public Node , public Entity
+class Player : public Node 
 {
 private:
-    int heart;
-    void initEventListener();
+    void onMouseDown(cocos2d::Event* event);
+    void onMouseUp(cocos2d::Event* event);
+    void onMouseMove(cocos2d::Event* event);
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 public:
-    int getHeart();
-    void setHeart(int heart);
-    void takeDamage(float damage);
-
     static Player* createPlayer();
     BulletPlayer* bullet;
     void update(float dt);
@@ -25,22 +24,18 @@ public:
     PhysicsBody* body;
     cocos2d::Vec2 direction;
 
-    void onMouseDown(cocos2d::Event* event);
-    void onMouseUp(cocos2d::Event* event);
-    void onMouseMove(cocos2d::Event* event);
+    void MoveCheck();
+    void PhysicBody();
+
     void Shooting();
+    void initLis();
     void setIsShooting(bool isShooting);
-
-    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-    void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-
-    //Animation
-    /*cocos2d::Animation* animation;
-    Animation* createAnimation(string prefixName, int pFramesOrder, float deplay);
-    void initAnimation();*/
-
+    
     bool isKeyDown = false;
     float speed;
+    //Animation
+    /*void initAnimation();
+    cocos2d::Animation* createAnimation(string prefixName, int pFramesOrder, float delay);*/
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);

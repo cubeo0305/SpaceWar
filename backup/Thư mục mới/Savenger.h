@@ -1,28 +1,22 @@
-#ifndef __Savenger_SCENE_H__
-#define __Savenger_SCENE_H__
+#ifndef __Savenger_H__
+#define __Savenger_H__
 
 #include "cocos2d.h"
-#include "Enemy.h"
+#include "Entity.h"
 
 using namespace cocos2d;
 
-class Savenger : public Enemy
+class Savenger : public Node , public Entity
 {
 private:
 public:
 	static Savenger* createSavenger();
 	virtual bool init();
-	
-	float maxHP;
 
 	PhysicsBody* body;
 	cocos2d::Sprite* savenger;
 	void AvenMove();
 	void update(float dt);
-
-	int getHealthEnemy();
-	void setHealthEnemy();
-
     CREATE_FUNC(Savenger);
 };
 

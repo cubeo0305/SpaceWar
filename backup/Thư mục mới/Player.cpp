@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "GameManager.h"
+#include "Constant.h"
 USING_NS_CC;
 
 Player* Player::createPlayer()
@@ -17,53 +19,72 @@ bool Player::init()
     this->speed = 200;
     this->direction = Vec2(1, 1);
 
-    this->player = Sprite::create("ship1.png");
+    this->player = Sprite::create("ship.png");
     this->player->setPosition(Vec2(300, 300));
+    this->player->setScale(1.3);
     addChild(this->player);
     
-    this->scheduleUpdate();
-    this->initLis();
-    this->PhysicBody();
+
+    /*SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ship.plist","playship.png");
+    this->player = Sprite::createWithSpriteFrameName("tile001.png");
+    addChild(this->player);
+    Animate* animationShip = Animate::create(Player::createAnimation("tile00", 10, -0.008f));
+    this->player->setPosition(Vec2(300, 300));
+    player->runAction(RepeatForever::create(animationShip));
+    this->player->setScale(3);*/
+
+    
+
     //this->initAnimation();
+    this->initEventListener();
+    this->scheduleUpdate();
+    
+    //set Hp, damage
+    this->setMaxHP(100);
+    this->setHP(100);
+    this->maxHP = 100;
+    this->hp = 100;
+    this->damage = 35;
+
+    //PhysicsBody
+    this->body = PhysicsBody::createBox(this->player->getContentSize());
+    this->body->setDynamic(false);
+    this->player->addComponent(this->body);
+     
+    this->body->setContactTestBitmask(PLAYER_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(PLAYER_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(PLAYER_COLLISION_BITMASK);
 
     return true;
 }
 //void Player::initAnimation()
 //{
-//    /*SpriteFrameCache::getInstance()->addSpriteFramesWithFile("animation/ship.plist","animation/ship.png");
+//    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ship.plist");
 //
 //    this->player = Sprite::createWithSpriteFrameName("tile000.png");
 //    this->player->setPosition(Vec2(300, 300));
-//    this->player->setScale(3.5);
 //    addChild(this->player);
 //
-//    
-//    Animate* animate = Animate::create(Player::createAnimation("tile00", 10, 0.8f));
-//    this->player->runAction(RepeatForever::create(animate));*/
+//    this->animation = Player::createAnimation("playship", 10, 0.1);
+//    auto animate = Animate::create(this->animation);
+//    this->player->runAction(RepeatForever::create(animate));
 //}
-//Animation* Player::createAnimation(string prefixName, int pFramesOrder, float delay) 
+//Animation* Player::createAnimation(string prefixName, int pFramesOrder, float deplay)
 //{
-//    //Vector<SpriteFrame*> animFrames;
-//    //for (int i = 0; i <= pFramesOrder; i++) {
-//    //    char buffer[20] = { 0 };
-//    //    sprintf(buffer, "%d.png", i);
-//    //    string imgName = prefixName + buffer; // The name of image in the sprite sheet
-//    //    auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(imgName);
-//    //    animFrames.pushBack(frame);
-//    //}
-//    //Animation* _animation = Animation::createWithSpriteFrames(animFrames, delay);
-//    //return _animation;
+//    Vector<SpriteFrame*>animFrames;
+//    for (int i = 0; i <= pFramesOrder; i++)
+//    {
+//        char buffer[20] = { 0 };
+//        sprintf(buffer, "(%d).png", i);
+//        string imgName = prefixName + buffer;
+//        auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(imgName);
+//        animFrames.pushBack(frame);
+//    }
+//    auto animation = Animation::createWithSpriteFrames(animFrames, deplay);
+//    
+//    return animation;
 //}
-void Player::PhysicBody()
-{
-    //PhysicsBody
-    this->body = PhysicsBody::createBox(this->player->getContentSize());
-    this->body->setDynamic(false);
-    this->body->setContactTestBitmask(true);
-    this->body->setCollisionBitmask(10);
-    this->player->addComponent(this->body);
-}
-void Player::initLis()
+void Player::initEventListener()
 {
     //init Mouse
     auto mouseListener = EventListenerMouse::create();
@@ -76,6 +97,26 @@ void Player::initLis()
     lis->onKeyReleased = CC_CALLBACK_2(Player::onKeyReleased, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(lis, this);
 }
+int Player::getHeart() {
+    return this->heart;
+}
+
+void Player::setHeart(int heart) {
+    this->heart = heart;
+}
+void Player::takeDamage(float damage) {
+    this->hp -= damage;
+    if (this->hp <= 0) {
+        if (this->heart > 0) {
+            this->heart--;
+            this->hp = this->maxHP;
+        }
+        else {
+            this->hp = 0;
+        }
+    }
+}
+
 void Player::update(float dt)
 {
     if (this->isKeyDown)
@@ -83,22 +124,6 @@ void Player::update(float dt)
         Vec2 curPos = this->player->getPosition();
         Vec2 newPos = curPos + (this->speed * dt * this->direction);
         this->player->setPosition(newPos);
-        this->MoveCheck();
-    }
-}
-void Player::MoveCheck()
-{
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
-    if (this->player->getPositionX() <= 10 || this->player->getPositionX() >= visibleSize.width - 10
-        || this->player->getPositionY() <= 10 || this->player->getPositionY() >= visibleSize.height - 10)
-    {
-        this->isKeyDown = false;
-    }
-    else
-    {
-        this->isKeyDown = true;
     }
 }
 void Player::onMouseUp(Event* event) {
@@ -114,7 +139,7 @@ void Player::onMouseDown(Event* event) {
 
     this->setIsShooting(true);
 }
-void Player::Shooting()
+void Player::Shooting() 
 {
     bullet = BulletPlayer::create();
     addChild(bullet);
@@ -130,7 +155,7 @@ void Player::setIsShooting(bool isShooting)
         // Schedule shooting
         this->player->schedule([&](float dt) {
             this->Shooting();
-            }, 0.1, "PlayerShooting");
+            }, 0.3, "PlayerShooting");
     }
     else {
         this->player->unschedule("PlayerShooting");

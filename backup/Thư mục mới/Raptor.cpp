@@ -1,4 +1,5 @@
 #include "Raptor.h"
+#include "Constant.h"
 USING_NS_CC;
 
 Raptor* Raptor::createRaptor()
@@ -17,48 +18,42 @@ bool Raptor::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    this->maxHP = 75;
-    this->healthEnemy = this->maxHP;
+    this->direction = Vec2(1, 1);
+    this->speed = 200;
 
-    this->raptor = Sprite::create("Enemy4.png");
-    this->raptor->setPosition(Vec2(random(50, 550), 850));
-    this->raptor->setRotation(180);
+    this->raptor = Sprite::create("Viper.png");
     addChild(this->raptor);
+    this->raptor->setScale(2);
+    //this->raptor->setRotation(180);
+    this->raptor->setPosition(Vec2(400, 400));
+    this->raptor->stopAllActions();
 
     this->raptor->schedule([&](float dt) {
         this->Shooting();
-        }, 1.3 , "RaptorShooting");
+        }, 2 , "RaptorShooting");
 
     this->scheduleUpdate();
-    this->RaptorMove();
-
-    //this->EnemiesMove(true);
+    this->EnemiesMove(true);
+    //info Raptor
+    this->damage = 50;
+    this->maxHP = 75;
+    this->hp = 75;
 
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->raptor->getContentSize());
     this->body->setDynamic(false);
-    this->body->setContactTestBitmask(true);
-    this->body->setCollisionBitmask(30);
     this->raptor->addComponent(this->body);
+
+    this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
 
     return true;
 }
+
 void Raptor::update(float dt)
 {
     
-}
-int Raptor::getHealthEnemy()
-{
-    return this->healthEnemy;
-}
-void Raptor::setHealthEnemy()
-{
-    this->healthEnemy -= 25;
-    if (this->healthEnemy <= 0)
-    {
-        this->raptor->removeFromParentAndCleanup(true);
-        this->unschedule("RaptorShooting");
-    }
 }
 void Raptor::Shooting()
 {
@@ -67,16 +62,7 @@ void Raptor::Shooting()
     bullet->setPosition(Vec2((int)raptor->getPositionX(),
         (int)raptor->getPositionY() - 15));
 }
-void Raptor::RaptorMove()
-{
-    auto moveBy = MoveBy::create(7, Vec2(0, -1000));
-    this->raptor->runAction(moveBy);
 
-    if (this->raptor->getPositionY() <= -20)
-    {
-        this->raptor->removeFromParentAndCleanup(true);
-    }
-}
 void Raptor::EnemiesMove(bool isStart = false)
 {
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -85,7 +71,7 @@ void Raptor::EnemiesMove(bool isStart = false)
     if (isStart)
     {
         this->raptor->setPosition(Vec2(visibleSize.width / 2, 900));
-        auto moveDown = MoveTo::create(2, Vec2(visibleSize.width / 2, 650));
+        auto moveDown = MoveTo::create(1, Vec2(visibleSize.width / 2, 650));
         this->raptor->runAction(Sequence::create(moveDown, CallFunc::create([&]() {
             EnemiesMove(false);
             }),nullptr));

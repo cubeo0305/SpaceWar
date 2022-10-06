@@ -1,130 +1,202 @@
 #include "GameScene.h"
-#include "GameManager.h"
-#include "Constant.h"
+#include "Enemy.h"
 USING_NS_CC;
 
 Scene* GameScene::createScene()
 {
     return GameScene::create();
 }
-
-// Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
-
-// on "init" you need to initialize your instance
 bool GameScene::init()
 {
-    //////////////////////////////
-    // 1. super init first
     if ( !Scene::initWithPhysics() )
     {
         return false;
     }
-
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
-    //background
-    auto background = Sprite::create("space.png");
-    background->setPosition(Vec2(0,0));
-    background->setAnchorPoint(Vec2(0,0));
-    background->setContentSize(Size(visibleSize.width,visibleSize.height));
-    addChild(background);
+    this->Wave = 0;
 
-    auto Ring = Sprite::create("ring.png");
-    Ring->setAnchorPoint(Vec2(0, 0));
-    Ring->setPosition(Vec2(0,770));
-    Ring->setRotation(90);
-    Ring->setScale(5);
-    addChild(Ring);
+    //backgournd
+    auto bg = Sprite::create("space.png");
+    bg->setContentSize(Size(visibleSize.width, visibleSize.height));
+    bg->setAnchorPoint(Vec2(0, 0));
+    addChild(bg);
 
-    //player add
+    this->planet = Sprite::create("ring.png");
+    this->planet->setRotation(90);
+    this->planet->setAnchorPoint(Vec2(0, 0));
+    this->planet->setPosition(Vec2(0,770));
+    this->planet->setScale(5);
+    addChild(this->planet);
+
+    this->schedule([&](float dt)
+        {
+            this->ActionPlane();
+
+        }, 2, "ActionPlane");
+
     player = Player::create();
     addChild(player);
 
     this->schedule([&](float dt)
         {
             this->SpawnEnemies();
-        }, 2, "SpawnEnemies");
+        }, 6.5, "SpawnEnemies");
 
-    savenger = Savenger::create();
-    addChild(savenger);
-
-    raptor = Raptor::create();
-    addChild(raptor);
-
+    this->WaveEnemies();
     this->initContactListener();
 
     return true;
 }
+void GameScene::ActionPlane()
+{
+    auto moveTo = MoveTo::create(1,Vec2(0,770));
+    auto point1 = MoveTo::create(1, Vec2(1,771));
+    auto sequen = Sequence::create(moveTo, point1, moveTo, nullptr);
+    this->planet->runAction(sequen);
+}
 void GameScene::SpawnEnemies()
 {
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    asteroid = Asteroid::create();
+    addChild(asteroid);
 
-    int posiXmax = visibleSize.width;
-    int PosiXmin = 0;
-    int posiX = rand() % (posiXmax - PosiXmin + 1) + PosiXmin;
+    raptor = Raptor::create();
+    addChild(raptor);
 
-    Vec2 position = Vec2(posiX, 650);
+    savenger = Savenger::create();
+    addChild(savenger);
 
-    //random Enemies
-    int intMaxEnemies = 1;
-    int intMinEnemies = 0;
-    int enemyType = rand() % (intMaxEnemies - intMinEnemies + 1) + intMinEnemies;
+    this->WaveEnemies();
 
-    switch (enemyType)
+    CCLOG("1");
+}
+void GameScene::WaveEnemies()
+{   
+    this->Wave -= 1;
+    if (this->Wave <= 0)
     {
-    /*case Entity::Raptor:
-        raptor = Raptor::create();
-        addChild(raptor);
-        break;
-    case Entity::Savenger:
-        savenger = Savenger::create();
-        addChild(savenger);
-        break;*/
-    /*case Entity::Asteroid:
-        asteroid = Asteroid::create();
-        addChild(asteroid);
-        break;*/
-    default:
-        asteroid = Asteroid::create();
-        addChild(asteroid);
-        break;
+        this->unschedule("SpawnEnemies");
+        boss = Boss::create();
+        addChild(boss);
     }
-    //asteroid->setPosition(Vec2(position));
 }
 void GameScene::initContactListener() {
     auto contactListener = EventListenerPhysicsContact::create();
     contactListener->onContactBegin = CC_CALLBACK_1(GameScene::onContactBegin, this);
-    contactListener->onContactSeparate = CC_CALLBACK_1(GameScene::onContactSeparate, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
 }
-
 bool GameScene::onContactBegin(PhysicsContact& contact) {
-    Node* nodeA = contact.getShapeA()->getBody()->getNode();
-    Node* nodeB = contact.getShapeB()->getBody()->getNode();
+    auto nodeA = contact.getShapeA()->getBody();
+    auto nodeB = contact.getShapeB()->getBody();
 
-    if (nodeA && nodeB)
+    //Savenger 
+    if (nodeA->getCollisionBitmask() == 15 && nodeB->getCollisionBitmask() == 20 ||
+        nodeB->getCollisionBitmask() == 20 && nodeA->getCollisionBitmask() == 15)
     {
-        Entity* entityA = GameManager::findEntity((Sprite*)nodeA);
-        Entity* entityB = GameManager::findEntity((Sprite*)nodeB);
-        float damageA = entityA->getDamage();
-        float damageB = entityB->getDamage();
-        entityA->TakeDamage(damageB);
-        entityB->TakeDamage(damageA);
+        if (nodeA->getCollisionBitmask() == 15)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+
+                auto savengerBody = dynamic_cast<Savenger*>(nodeB->getNode());
+                this->savenger->setHealthEnemy();
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 15)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+
+                auto savengerBody = dynamic_cast<Savenger*>(nodeA->getNode());
+                this->savenger->setHealthEnemy();
+            }
+        }
+    }
+    //Raptor
+    if (nodeA->getCollisionBitmask() == 15 && nodeB->getCollisionBitmask() == 30 ||
+        nodeB->getCollisionBitmask() == 30 && nodeA->getCollisionBitmask() == 15)
+    {
+        if (nodeA->getCollisionBitmask() == 15)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+
+                auto raptorBody = dynamic_cast<Raptor*>(nodeB->getNode());
+                this->raptor->setHealthEnemy();
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 15)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+
+                auto raptorBody = dynamic_cast<Raptor*>(nodeA->getNode());
+                this->raptor->setHealthEnemy();
+            }
+        }
+    }
+    //Asteroid
+    if (nodeA->getCollisionBitmask() == 15 && nodeB->getCollisionBitmask() == 40 ||
+        nodeB->getCollisionBitmask() == 40 && nodeA->getCollisionBitmask() == 15)
+    {
+        if (nodeA->getCollisionBitmask() == 15)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+
+                auto AsteroidBody = dynamic_cast<Asteroid*>(nodeB->getNode());
+                this->asteroid->setHealthEnemy();
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 15)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+
+                auto AsteroidBody = dynamic_cast<Asteroid*>(nodeB->getNode());
+                this->asteroid->setHealthEnemy();
+            }
+        }
+    }
+    //Boss
+    if (nodeA->getCollisionBitmask() == 15 && nodeB->getCollisionBitmask() == 50 ||
+        nodeB->getCollisionBitmask() == 50 && nodeA->getCollisionBitmask() == 15)
+    {
+        if (nodeA->getCollisionBitmask() == 15)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+
+                auto BossBody = dynamic_cast<Boss*>(nodeB->getNode());
+                this->boss->setHealthEnemy();
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 15)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+
+                auto BossBody = dynamic_cast<Boss*>(nodeB->getNode());
+                this->boss->setHealthEnemy();
+            }
+        }
     }
 
     return true;
-}
-
-void GameScene::onContactSeparate(PhysicsContact& contact) {
-    Node* nodeA = contact.getShapeA()->getBody()->getNode();
-    Node* nodeB = contact.getShapeB()->getBody()->getNode();
 }
 void GameScene::menuCloseCallback(Ref* pSender)
 {

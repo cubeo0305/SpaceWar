@@ -5,32 +5,16 @@
 #include "Player.h"
 #include "Raptor.h"
 #include "Savenger.h"
-#include "Entity.h"
-#include <vector>
 
-static class GameManager 
+
+class GameManager : public cocos2d::Scene
 {
 public:
-    GameManager();
-    ~GameManager();
+    static cocos2d::Scene* createScene();
     virtual bool init();
-    static Scene* world;
-    static std::vector<Entity*> enemies;
-    static std::vector<Entity*> entities;
 
-    Player* player;
-    Raptor* raptor;
-    Savenger* savenger;
-
-    static void setWorld(Scene* world);
-    static Scene* getWorld();
-    void SpawnEnemies();
-    void Start();
-
-    static void addEntity(Entity* entity);
-    static Entity* findEntity(Sprite* sprite);
-    static void destroyEntity(Entity* entity);
-
+    int EnemyDie;
+    CREATE_FUNC(GameManager);
 };
 
 #endif // __GameManager_SCENE_H__

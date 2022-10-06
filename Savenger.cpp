@@ -1,5 +1,4 @@
 #include "Savenger.h"
-#include "Constant.h"
 USING_NS_CC;
 
 Savenger* Savenger::createSavenger()
@@ -14,47 +13,62 @@ bool Savenger::init()
     {
         return false;
     }
-    this->savenger = Sprite::create("Savenger.png");
-    this->savenger->setRotation(180);
-    this->savenger->setPosition(Vec2(-30, 650));
-    this->savenger->setScale(2);
-    addChild(this->savenger);
 
-    this->schedule([&](float dt)
-        {
-            this->AvenMove();
-        }, 6, "Movement");
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    //info Savenger
     this->maxHP = 100;
-    this->hp = 100;
-    this->damage = 100;
+    this->healthEnemy = this->maxHP;
+
+    this->savenger = Sprite::create("Raptor.png");
+    this->savenger->setRotation(180);
+    this->savenger->setPosition(Vec2(random(50, 550), 850));
+    addChild(this->savenger);
 
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->savenger->getContentSize());
     this->body->setDynamic(false);
+    this->body->setContactTestBitmask(true);
+    this->body->setCollisionBitmask(20);
     this->savenger->addComponent(this->body);
 
-    this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
-    this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
-    this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
-    
     this->scheduleUpdate();
+    this->AvenMove();
 
     return true;
 }
-
 void Savenger::update(float dt)
 {
-    
+
+}
+int Savenger::getHealthEnemy()
+{
+    return this->maxHP;
+}
+void Savenger::setHealthEnemy()
+{
+    this->healthEnemy -= 25;
+    if (this->healthEnemy <= 0)
+    {
+        this->savenger->removeFromParentAndCleanup(true);
+    }
 }
 void Savenger::AvenMove()
 {
-    auto Point1 = MoveTo::create(1, Vec2(590, 650));
+    /*auto Point1 = MoveTo::create(1, Vec2(590, 650));
     auto Point2 = MoveTo::create(1, Vec2(390, 650));
     auto Point3 = MoveTo::create(1, Vec2(190, 650));
     auto Point4 = MoveTo::create(1, Vec2(10, 650));
  
     auto sequen = Sequence::create(Point1, Point2, Point3, Point4, Point3, Point2, nullptr);
-    this->savenger->runAction(sequen);
+    this->savenger->runAction(sequen);*/
+
+    auto moveBy = MoveBy::create(8, Vec2(0, -1000));
+    this->savenger->runAction(moveBy);
+
+    if (this->savenger->getPositionY() <= -20)
+    {
+        this->savenger->removeFromParentAndCleanup(true);
+    }
+
 }

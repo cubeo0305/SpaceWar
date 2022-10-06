@@ -11,6 +11,7 @@ class Entity
 public: 
     Sprite* sprite;
     int healthEnemy;
+
     float maxHP;
     float hp;
     float damage;
@@ -18,20 +19,25 @@ public:
     Entity();
     Entity(const string& file);
     ~Entity();
+
+    virtual void destroy();
+
     enum Enemies {
         Raptor,
         Savenger
     };
+    Sprite* getSprite();
+
+    void init();
+
+    void setMaxHP(float hp);
+    float getMaxHP();
+    void setHP(float hp);
+    float getHP();
     
-    virtual void setMaxHP(float hp);
-    virtual float getMaxHP();
-    
-    virtual void setHealthEnemy(float hp);
-    virtual int getHealthEnemy();
-    
-    virtual float getDamage();
-    virtual void setDamage(float damage);
-    virtual void TakeDamage(float damage);
+    float getDamage();
+    void setDamage(float damage);
+    void TakeDamage(float damage);
 };
 
 #endif // __Entity_SCENE_H__

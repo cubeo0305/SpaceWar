@@ -2,13 +2,11 @@
 #define __Asteroid_H__
 
 #include "cocos2d.h"
-#include "GameManager.h"
-#include "Enemy.h"
-#include "Count.h"
+#include "Entity.h"
 
 using namespace cocos2d;
 
-class Asteroid : public Enemy
+class Asteroid : public Node , public Entity
 {
 private:
 public:
@@ -16,13 +14,9 @@ public:
 	virtual bool init();
 
 	PhysicsBody* body;
-	float maxHP;
 	cocos2d::Sprite* asteroid;
 	void AvenMove();
 	void update(float dt);
-
-	int getHealthEnemy();
-	void setHealthEnemy();
 
     CREATE_FUNC(Asteroid);
 };

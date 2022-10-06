@@ -1,4 +1,5 @@
 #include "Asteroid.h"
+#include "Constant.h"
 USING_NS_CC;
 
 Asteroid* Asteroid::createAsteroid()
@@ -7,6 +8,8 @@ Asteroid* Asteroid::createAsteroid()
 }
 bool Asteroid::init()
 {
+    //////////////////////////////
+    // 1. super init first
     if ( !Node::init() )
     {
         return false;
@@ -18,44 +21,31 @@ bool Asteroid::init()
 
     //info Savenger
     this->maxHP = 1;
-    this->healthEnemy = this->maxHP;
+    this->hp = 1;
+    this->damage = 100;
 
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->asteroid->getContentSize());
     this->body->setDynamic(false);
-    this->body->setContactTestBitmask(true);
-    this->body->setCollisionBitmask(40);
     this->asteroid->addComponent(this->body);
 
+    this->body->setContactTestBitmask(ENEMY_CONTACT_TEST_BITMASK);
+    this->body->setCategoryBitmask(ENEMY_CATEGORY_BITMASK);
+    this->body->setCollisionBitmask(ENEMY_COLLISION_BITMASK);
+    
     this->scheduleUpdate();
 
     this->AvenMove();
 
     return true;
 }
-int Asteroid::getHealthEnemy()
-{
-    return this->maxHP;
-}
-void Asteroid::setHealthEnemy()
-{
-    this->healthEnemy -= 25;
-    if (this->healthEnemy <= 0)
-    {
-        this->asteroid->removeFromParentAndCleanup(true);
-    }
-}
+
 void Asteroid::update(float dt)
 {
     
 }
 void Asteroid::AvenMove()
 {
-    auto moveBy = MoveBy::create(6, Vec2(0, -1000));
+    auto moveBy = MoveBy::create(5, Vec2(0, -1500));
     this->asteroid->runAction(moveBy);
-
-    if (this->asteroid->getPositionY() <= -20)
-    {
-        this->asteroid->removeFromParentAndCleanup(true);
-    }
 }
