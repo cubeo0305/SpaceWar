@@ -16,27 +16,28 @@ bool BulletEnemy::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     //Sprite Bullet & Action
-    this->bullet = Sprite::create("bpum2.png");
-    //this->bullet->setContentSize(Size(15, 15));
-    this->bullet->setScale(1.5);
-    this->bullet->setRotation(180);
-    addChild(this->bullet);
+    this->bulletenemy = Sprite::create("bpum2.png");
+    this->bulletenemy->setScale(1.5);
+    this->bulletenemy->setRotation(180);
+    addChild(this->bulletenemy);
 
-    auto onBottom = MoveBy::create(1, Vec2(0, -700));
+    auto onBottom = MoveBy::create(3, Vec2(0, -700));
     auto cleanUp = CallFunc::create([=]() {
-        this->bullet->removeFromParentAndCleanup(true);
+        if (this->bulletenemy->getPositionY() <= 0)
+        {
+            this->bulletenemy->removeFromParentAndCleanup(true);
+        }
         });
     auto sequence = Sequence::create(onBottom, cleanUp, nullptr);
-    this->bullet->runAction(sequence);
+    this->bulletenemy->runAction(sequence);
 
     //PhysicsBody
-    this->body = PhysicsBody::createCircle(this->bullet->getContentSize().width/4);
+    this->body = PhysicsBody::createCircle(
+        this->bulletenemy->getContentSize().width/4);
     this->body->setDynamic(false);
     this->body->setContactTestBitmask(true);
     this->body->setCollisionBitmask(25);
-    this->bullet->addComponent(this->body);
-
-    
+    this->bulletenemy->addComponent(this->body);
 
     return true;
 }

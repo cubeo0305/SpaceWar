@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "AudioEngine.h"
+
 USING_NS_CC;
 
 Player* Player::createPlayer()
@@ -14,53 +16,86 @@ bool Player::init()
     {
         return false;
     }
-    this->speed = 200;
+    this->speed = 300;
     this->direction = Vec2(1, 1);
-
-    this->player = Sprite::create("ship1.png");
-    this->player->setPosition(Vec2(300, 300));
-    addChild(this->player);
     
+    this->maxHP = 100;
+    hp = this->maxHP;
+
+    /*this->player = Sprite::create("ship1.png");
+    this->player->setPosition(Vec2(300, 300));
+    addChild(this->player);*/
     this->scheduleUpdate();
     this->initLis();
-    this->PhysicBody();
-    //this->initAnimation();
-
+    this->initAnimation();
+    this->RunAnimation();
+    this->bodys();
     return true;
 }
-//void Player::initAnimation()
-//{
-//    /*SpriteFrameCache::getInstance()->addSpriteFramesWithFile("animation/ship.plist","animation/ship.png");
-//
-//    this->player = Sprite::createWithSpriteFrameName("tile000.png");
-//    this->player->setPosition(Vec2(300, 300));
-//    this->player->setScale(3.5);
-//    addChild(this->player);
-//
-//    
-//    Animate* animate = Animate::create(Player::createAnimation("tile00", 10, 0.8f));
-//    this->player->runAction(RepeatForever::create(animate));*/
-//}
-//Animation* Player::createAnimation(string prefixName, int pFramesOrder, float delay) 
-//{
-//    //Vector<SpriteFrame*> animFrames;
-//    //for (int i = 0; i <= pFramesOrder; i++) {
-//    //    char buffer[20] = { 0 };
-//    //    sprintf(buffer, "%d.png", i);
-//    //    string imgName = prefixName + buffer; // The name of image in the sprite sheet
-//    //    auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(imgName);
-//    //    animFrames.pushBack(frame);
-//    //}
-//    //Animation* _animation = Animation::createWithSpriteFrames(animFrames, delay);
-//    //return _animation;
-//}
-void Player::PhysicBody()
+int Player::getHealPlayer()
+{
+    return this->maxHP;
+}
+void Player::setHealPlayer()
+{
+    hp -= 10;
+    if (hp <= 0)
+    {
+        this->pause();
+    }
+}
+void Player::setHealth()
+{
+    hp += 50;
+
+    if (this->hp >= 100)
+    {
+        hp = this->maxHP;
+    }
+}
+void Player::initAnimation()
+{
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("animation/ship.plist");
+
+    this->player = Sprite::createWithSpriteFrameName("tile000.png");
+    //this->player->setPosition(Vec2(300, 300));
+    this->player->setScale(3.5);
+    addChild(this->player);
+
+    Animate* animate = Animate::create(Player::createAnimation("tile00", 10, 0.15));
+    this->player->runAction(RepeatForever::create(animate));
+}
+void Player::RunAnimation()
+{
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    
+    this->player->setPosition(Vec2(visibleSize.width / 2, -20));
+
+    auto moveTo = MoveTo::create(3,Vec2(visibleSize.width/2,200));
+    auto sequen = Sequence::create(moveTo,nullptr);
+    this->player->runAction(sequen);
+}
+Animation* Player::createAnimation(string prefixName, int pFramesOrder, float delay) 
+{
+    Vector<SpriteFrame*> animFrames;
+    for (int i = 0; i < pFramesOrder; i++) {
+        char buffer[20] = { 0 };
+        sprintf(buffer, "%d.png", i);
+        string imgName = prefixName + buffer; // The name of image in the sprite sheet
+        auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(imgName);
+        animFrames.pushBack(frame);
+    }
+    Animation* _animation = Animation::createWithSpriteFrames(animFrames, delay);
+    return _animation;
+}
+void Player::bodys()
 {
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->player->getContentSize());
     this->body->setDynamic(false);
     this->body->setContactTestBitmask(true);
-    this->body->setCollisionBitmask(10);
+    this->body->setCollisionBitmask(1);
     this->player->addComponent(this->body);
 }
 void Player::initLis()
@@ -84,7 +119,7 @@ void Player::update(float dt)
         Vec2 newPos = curPos + (this->speed * dt * this->direction);
         this->player->setPosition(newPos);
         this->MoveCheck();
-    }
+    }    
 }
 void Player::MoveCheck()
 {
@@ -101,21 +136,20 @@ void Player::MoveCheck()
         this->isKeyDown = true;
     }
 }
-void Player::onMouseUp(Event* event) {
-    EventMouse* e = (EventMouse*)event;
-
-    Vec2 location = e->getLocationInView();
-
+void Player::onMouseUp(Event* event) 
+{
     this->setIsShooting(false);
 }
-void Player::onMouseDown(Event* event) {
-    EventMouse* e = (EventMouse*)event;
-    Vec2 location = e->getLocationInView();
-
+void Player::onMouseDown(Event* event) 
+{
     this->setIsShooting(true);
 }
 void Player::Shooting()
 {
+    
+
+    this->soundshoot = AudioEngine::play2d("sound/laser.wav", true);
+
     bullet = BulletPlayer::create();
     addChild(bullet);
     bullet->setPosition(Vec2((int)player->getPositionX(),

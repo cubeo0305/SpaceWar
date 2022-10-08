@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "GameScene.h"
 
 USING_NS_CC;
 
@@ -39,7 +40,6 @@ bool HelloWorld::init()
     mouseListener->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
-
     this->initContactListener();
     this->scheduleUpdate();
 
@@ -50,9 +50,9 @@ void HelloWorld::onMouseDown(Event* event) {
 
     Vec2 location = e->getLocationInView();
 
-    auto moveTo = MoveTo::create(1, location);
-    this->mySprite->stopAllActions();
-    this->mySprite->runAction(moveTo);
+    auto hello = GameScene::createScene();
+    Director::getInstance()->replaceScene(TransitionFade::create(0.5, hello));
+
 }
 void HelloWorld::update(float dt)
 {
@@ -104,7 +104,6 @@ void HelloWorld::onContactSeparate(PhysicsContact& contact) {
         nodeB->setColor(Color3B(255, 255, 255));
     }
 }
-
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application

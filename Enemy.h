@@ -12,7 +12,6 @@ public:
 	virtual void setHealthEnemy() = 0;
 	
 protected:
-	float EnemyDie = 0;
 	int healthEnemy;
 };
 

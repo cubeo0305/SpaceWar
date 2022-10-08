@@ -17,7 +17,6 @@ bool BulletPlayer::init()
     
     //Sprite Bullet & Action
     this->bullet = Sprite::create("bred2.png");
-    //this->bullet->setContentSize(Size(30, 30));
     this->bullet->setScale(1.5);
     addChild(this->bullet);
 
@@ -29,7 +28,8 @@ bool BulletPlayer::init()
     this->bullet->runAction(sequence);
 
     //PhysicsBody
-    this->body = PhysicsBody::createCircle(this->bullet->getContentSize().width/4);
+    this->body = PhysicsBody::createCircle(
+        this->bullet->getContentSize().width/4);
     this->body->setDynamic(false);
     this->body->setContactTestBitmask(true);
     this->body->setCollisionBitmask(15);

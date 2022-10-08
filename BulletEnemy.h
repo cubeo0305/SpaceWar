@@ -12,7 +12,7 @@ public:
         
     PhysicsBody* body;
 
-    cocos2d::Sprite* bullet;
+    cocos2d::Sprite* bulletenemy;
 
     CREATE_FUNC(BulletEnemy);
 };

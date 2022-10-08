@@ -5,6 +5,7 @@
 #include "Enemy.h"
 
 using namespace cocos2d;
+using namespace std;
 
 class Savenger : public Enemy
 {

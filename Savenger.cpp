@@ -1,6 +1,7 @@
 #include "Savenger.h"
 USING_NS_CC;
 
+
 Savenger* Savenger::createSavenger()
 {
     return Savenger::create();
@@ -20,9 +21,10 @@ bool Savenger::init()
     this->maxHP = 100;
     this->healthEnemy = this->maxHP;
 
-    this->savenger = Sprite::create("Raptor.png");
+    this->savenger = Sprite::create("Gunboss.png");
     this->savenger->setRotation(180);
     this->savenger->setPosition(Vec2(random(50, 550), 850));
+    this->savenger->setScale(2.5);
     addChild(this->savenger);
 
     //PhysicsBody
@@ -34,6 +36,7 @@ bool Savenger::init()
 
     this->scheduleUpdate();
     this->AvenMove();
+    
 
     return true;
 }

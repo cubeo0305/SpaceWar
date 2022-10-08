@@ -20,22 +20,34 @@ public:
     BulletPlayer* bullet;
     void update(float dt);
     virtual bool init();
+    
+    float maxHP;
+    int hp;
+    int soundshoot;
+
     cocos2d::Sprite* player;
     PhysicsBody* body;
     cocos2d::Vec2 direction;
 
     void MoveCheck();
-    void PhysicBody();
+    void bodys();
 
     void Shooting();
     void initLis();
+    void RunAnimation();
     void setIsShooting(bool isShooting);
     
     bool isKeyDown = false;
     float speed;
+
+    //setHeal
+    void setHealPlayer();
+    int getHealPlayer();
+    void setHealth();
+
     //Animation
-    /*void initAnimation();
-    cocos2d::Animation* createAnimation(string prefixName, int pFramesOrder, float delay);*/
+    void initAnimation();
+    cocos2d::Animation* createAnimation(string prefixName, int pFramesOrder, float delay);
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);

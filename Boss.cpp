@@ -1,4 +1,5 @@
 #include "Boss.h"
+#include "HelloWorldScene.h"
 
 USING_NS_CC;
 
@@ -14,15 +15,20 @@ bool Boss::init()
     }
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    //GunBoss
+    bossgun = Sprite::create("Gunboss.png");
+    bossgun->setPosition(Vec2(8.3, 10));
+    bossgun->setContentSize(Size(15, 15));
     //Sprite Boss
     this->boss = Sprite::create("TieF.png");
-    this->boss->setPosition(Vec2(visibleSize.width/2 , 850));
+    this->boss->setPosition(Vec2(visibleSize.width/2 , 650));
     this->boss->setScale(5);
     addChild(this->boss);
+    //this->boss->addChild(bossgun);
 
     //info Boss
-    this->maxHP = 1000;
-    this->healthEnemy = this->maxHP;
+    this->maxHP = 2000;
+    hp = this->maxHP;
 
     this->scheduleUpdate();
     this->initLis();
@@ -31,6 +37,11 @@ bool Boss::init()
         {
             this->Shooting();
         }, 3, "BossShooting");
+
+    this->schedule([&](float dt)
+        {
+            this->GunLook();
+        }, 0.01, "GunLook");
 
     return true;
 }
@@ -49,11 +60,16 @@ int Boss::getHealthEnemy()
 }
 void Boss::setHealthEnemy()
 {
-    this->healthEnemy -= 25;
-    if (this->healthEnemy <= 0)
+    this->hp -= random(17,25);
+    if (this->hp <= 0)
     {
         this->boss->removeFromParentAndCleanup(true);
         this->unschedule("BossShooting");
+        this->unschedule("GunLook");
+
+        auto hello = HelloWorld::createScene();
+        Director::getInstance()->replaceScene(TransitionFade::create(5 ,hello));
+        //this->player->unschedule("PlayerShooting");
     }
 }
 void Boss::update(float dt)
@@ -94,8 +110,27 @@ void Boss::AvenMove(bool isStart)
 }
 void Boss::Shooting()
 {
-    bullet = BulletEnemy::create();
+    Vec2 bossPos = this->convertToWorldSpace(this->boss->getPosition());
+    Vec2 playerPos = this->convertToWorldSpace(this->player->player->getPosition());
+
+    Vec2 dir = playerPos - bossPos;
+    float radian = dir.getAngle(Vec2(0, 1));
+    float angle = radian * 180 / M_PI;
+    //this->boss->setRotation(angle);
+
+    bullet = BulletEnemyBoss::create();
     addChild(bullet);
     bullet->setPosition(Vec2((int)boss->getPositionX(),
-        (int)boss->getPositionY() - 15));
+        (int)boss->getPositionY() - 45));
+    bullet->setRotation(angle);
+}
+void Boss::GunLook() 
+{
+    Vec2 bossPos = this->convertToWorldSpace(this->boss->getPosition());
+    Vec2 playerPos = this->convertToWorldSpace(this->player->player->getPosition());
+
+    Vec2 dir = playerPos - bossPos;
+    float radian = dir.getAngle(Vec2(0, 1));
+    float angle = radian * 180 / M_PI;
+    this->boss->setRotation(angle);
 }

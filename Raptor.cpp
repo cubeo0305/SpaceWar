@@ -20,9 +20,10 @@ bool Raptor::init()
     this->maxHP = 75;
     this->healthEnemy = this->maxHP;
 
-    this->raptor = Sprite::create("Enemy4.png");
+    this->raptor = Sprite::create("ship1.png");
     this->raptor->setPosition(Vec2(random(50, 550), 850));
     this->raptor->setRotation(180);
+    this->raptor->setScale(2);
     addChild(this->raptor);
 
     this->raptor->schedule([&](float dt) {
