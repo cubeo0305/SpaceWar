@@ -16,7 +16,7 @@ bool BulletPlayer::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     //Sprite Bullet & Action
-    this->bullet = Sprite::create("bred2.png");
+    this->bullet = Sprite::create("bred1.png");
     this->bullet->setScale(1.5);
     addChild(this->bullet);
 

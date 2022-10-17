@@ -6,7 +6,7 @@
 class HelloWorld : public cocos2d::Scene
 {
 public:
-    static cocos2d::Scene* createScene();
+    static cocos2d::Scene* createScene(int _score);
 
     virtual bool init();
     void update(float dt);
@@ -14,14 +14,15 @@ public:
 private:
     cocos2d::Sprite* mySprite;
     cocos2d::Sprite* mySprite2;
-    void onMouseDown(cocos2d::Event* event);
-
+    
+    int sound;
+    int soundWin;
     // When collision ended
     void onContactSeparate(cocos2d::PhysicsContact& contact);
 
     // Init contact listener
     void initContactListener();
-
+    void onMouseDown(cocos2d::Event* event);
 
     void menuCloseCallback(cocos2d::Ref* pSender);
     

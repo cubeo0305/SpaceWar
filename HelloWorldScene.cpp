@@ -1,21 +1,21 @@
 #include "HelloWorldScene.h"
 #include "GameScene.h"
-
+#include "AudioEngine.h"
+#include "MainMenuGame.h"
+#include "ui/CocosGUI.h"
 USING_NS_CC;
+int score = 0;
 
-Scene* HelloWorld::createScene()
+Scene* HelloWorld::createScene(int _score)
 {
+    score = _score;
     return HelloWorld::create();
 }
-
-// Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
-
-// on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
     if (!Scene::initWithPhysics())
@@ -25,22 +25,54 @@ bool HelloWorld::init()
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    this->mySprite = Sprite::create("Player.png");
-    addChild(this->mySprite);
-    this->mySprite->setPosition(Vec2(50, 50));
-
-
-    this->mySprite2 = Sprite::create("Player.png");
-    addChild(this->mySprite2);
-    this->mySprite2->setPosition(Vec2(300, 200));
-
-    // Init mouse event listener
+    
     auto mouseListener = EventListenerMouse::create();
-    mouseListener->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+        mouseListener->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
+        _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+    auto bg = Sprite::create("bg_01.png");
+    bg->setAnchorPoint(Vec2(0,0));
+    bg->setContentSize(Size(visibleSize));
+    addChild(bg);
+    //output dmg
+    auto myLabel = Label::createWithTTF("Victory", "fonts/Marker Felt.ttf", 50);
+        myLabel->setTextColor(Color4B(255, 255, 255, 100));
+        myLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 0.8));
+        myLabel->enableShadow(Color4B::YELLOW);
+        myLabel->enableOutline(Color4B(255, 0, 0, 255), 1);
+        myLabel->enableGlow(Color4B(200, 20, 0, 255));
+        addChild(myLabel);
+    
+    std::string str = "Score: " +  std::to_string(score);
+    auto label = Label::createWithTTF(str, "fonts/Marker Felt.ttf", 35);
+    addChild(label);
+    label->setPosition(visibleSize.width/2,550);
+    
+    Vector<MenuItem*> menuItems = {
+        MenuItemImage::create("backgrounds/back.png","backgrounds/back.png"  , [&](Ref* sender) {
+               this->sound = AudioEngine::play2d("sound/select.wav");
+               auto as = MainMenuGame::createScene();
+               Director::getInstance()->replaceScene(TransitionFade::create(0.5, as));
+           }),
+           MenuItemImage::create("backgrounds/re.png","backgrounds/re.png"  , [&](Ref* sender) {
+               this->sound = AudioEngine::play2d("sound/select.wav");
+               auto hello = GameScene::createScene();
+               Director::getInstance()->replaceScene(TransitionFade::create(0.5, hello));
+           }),
+       };
 
-    this->initContactListener();
+        auto menu = Menu::createWithArray(menuItems);
+        addChild(menu);
+        menu->setScale(0.5);
+        menu->setAnchorPoint(Vec2(0,0));
+        menu->alignItemsHorizontallyWithPadding(10);
+        menu->setPosition(visibleSize/2);
+    
+    AudioEngine::preload("sound/win.wav");
+    scheduleOnce([&](float dt)
+    {
+        soundWin = AudioEngine::play2d("sound/win.wav");
+    }, 0.7,"deplay");
+    
     this->scheduleUpdate();
 
     return true;
@@ -50,8 +82,7 @@ void HelloWorld::onMouseDown(Event* event) {
 
     Vec2 location = e->getLocationInView();
 
-    auto hello = GameScene::createScene();
-    Director::getInstance()->replaceScene(TransitionFade::create(0.5, hello));
+    
 
 }
 void HelloWorld::update(float dt)
@@ -59,50 +90,9 @@ void HelloWorld::update(float dt)
 
 }
 void HelloWorld::initContactListener() {
-    auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactBegin = [](PhysicsContact& contact) {
-        Node* nodeA = contact.getShapeA()->getBody()->getNode();
-        Node* nodeB = contact.getShapeB()->getBody()->getNode();
-
-        if (nodeA && nodeB) {
-            if (nodeA->getTag() == 10) {
-                nodeB->setColor(Color3B::RED);
-            }
-            else if (nodeB->getTag() == 10) {
-                nodeA->setColor(Color3B::RED);
-            }
-        }
-        return true;
-    };
-    contactListener->onContactSeparate = CC_CALLBACK_1(HelloWorld::onContactSeparate, this);
-
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
-
-    // init physic body
-    auto physicsBody = PhysicsBody::createCircle(this->mySprite->getContentSize().width / 2);
-    physicsBody->setDynamic(false);
-    physicsBody->setContactTestBitmask(0x01); //0001
-    physicsBody->setCategoryBitmask(0x01); // 0001
-    physicsBody->setCollisionBitmask(0x01); // 0001
-    this->mySprite->addComponent(physicsBody);
-    this->mySprite->setTag(10); // identity for mySprite
-
-    auto physicsBody2 = PhysicsBody::createCircle(this->mySprite2->getContentSize().width / 2);
-    physicsBody2->setDynamic(false);
-    physicsBody2->setContactTestBitmask(0x01); // 0010 
-    physicsBody2->setCategoryBitmask(0x03); // 0011
-    physicsBody2->setCollisionBitmask(0x01); // 0001
-    this->mySprite2->addComponent(physicsBody2);
-    this->mySprite2->setTag(1); //identity for mySprite2
+   
 }
 void HelloWorld::onContactSeparate(PhysicsContact& contact) {
-    Node* nodeA = contact.getShapeA()->getBody()->getNode();
-    Node* nodeB = contact.getShapeB()->getBody()->getNode();
-
-    if (nodeA && nodeB) {
-        nodeA->setColor(Color3B::WHITE);
-        nodeB->setColor(Color3B(255, 255, 255));
-    }
 }
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {

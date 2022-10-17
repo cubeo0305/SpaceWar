@@ -2,7 +2,6 @@
 #define __Asteroid_H__
 
 #include "cocos2d.h"
-#include "GameManager.h"
 #include "Enemy.h"
 #include "Count.h"
 
@@ -18,6 +17,7 @@ public:
 	PhysicsBody* body;
 	float maxHP;
 	cocos2d::Sprite* asteroid;
+    int sound;
 	void AvenMove();
 	void update(float dt);
 

@@ -24,6 +24,7 @@ public:
     float maxHP;
     int hp;
     int soundshoot;
+    
 
     cocos2d::Sprite* player;
     PhysicsBody* body;

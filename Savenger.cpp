@@ -1,4 +1,6 @@
 #include "Savenger.h"
+#include "AudioEngine.h"
+
 USING_NS_CC;
 
 
@@ -21,10 +23,9 @@ bool Savenger::init()
     this->maxHP = 100;
     this->healthEnemy = this->maxHP;
 
-    this->savenger = Sprite::create("Gunboss.png");
-    this->savenger->setRotation(180);
+    this->savenger = Sprite::create("Y wing.png");
     this->savenger->setPosition(Vec2(random(50, 550), 850));
-    this->savenger->setScale(2.5);
+    this->savenger->setScale(2);
     addChild(this->savenger);
 
     //PhysicsBody
@@ -51,22 +52,18 @@ int Savenger::getHealthEnemy()
 void Savenger::setHealthEnemy()
 {
     this->healthEnemy -= 25;
+    soundexplosion = AudioEngine::play2d("sound/hit.wav");
+    AudioEngine::setVolume(soundexplosion, 0.3);
     if (this->healthEnemy <= 0)
     {
+        this->soundexplosion = AudioEngine::play2d("sound/die.wav");
+        AudioEngine::setVolume(soundexplosion, 0.2);
         this->savenger->removeFromParentAndCleanup(true);
     }
 }
 void Savenger::AvenMove()
 {
-    /*auto Point1 = MoveTo::create(1, Vec2(590, 650));
-    auto Point2 = MoveTo::create(1, Vec2(390, 650));
-    auto Point3 = MoveTo::create(1, Vec2(190, 650));
-    auto Point4 = MoveTo::create(1, Vec2(10, 650));
- 
-    auto sequen = Sequence::create(Point1, Point2, Point3, Point4, Point3, Point2, nullptr);
-    this->savenger->runAction(sequen);*/
-
-    auto moveBy = MoveBy::create(8, Vec2(0, -1000));
+    auto moveBy = MoveBy::create(5, Vec2(0, -1000));
     this->savenger->runAction(moveBy);
 
     if (this->savenger->getPositionY() <= -20)

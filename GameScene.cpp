@@ -1,8 +1,10 @@
 #include "GameScene.h"
 #include "Enemy.h"
 #include "HelloWorldScene.h"
+#include "LoseScene.h"
 #include "ui/CocosGUI.h"
 #include "AudioEngine.h"
+#include "PauseGame.h"
 USING_NS_CC;
 
 
@@ -25,7 +27,7 @@ bool GameScene::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
-    this->Wave = 4; 
+    this->Wave = 10;  // 20 wave
     this->damage = 0;
 
     this->schedule([&](float dt)
@@ -38,8 +40,16 @@ bool GameScene::init()
             this->cloud();
         }, 3, "cloud");
     this->BackGround();
+    
+    
+    //addChild(this->bgmusic);
+    
     player = Player::create();
     addChild(player);
+    
+    //test
+    
+    //
 
     this->scheduleUpdate();
     this->InitGame();
@@ -51,19 +61,42 @@ void GameScene::InitGame()
     this->WaveEnemies();
     this->initContactListener();
     this->initPlayerUI();
-
+    this->pauseGame();
     this->schedule([&](float dt)
         {
             this->SpawnEnemies();
-        }, 6.5, "SpawnEnemies");
+        }, 7.5, "SpawnEnemies");
     this->schedule([&](float dt)
         {
             this->PlayerDie();
+            //this->WinGame();
         }, 0.01, "test");
+    
     this->schedule([&](float dt)
         {
             this->HealthPlayer();
         }, 13, "Healing");
+}
+void GameScene::pauseGame()
+{
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    
+    Vector<MenuItem*> menuItems = {
+            MenuItemImage::create("backgrounds/Pause01.png","backgrounds/Pause01.png", [&](Ref* sender) {
+                this->soundEffect = AudioEngine::play2d("sound/select.wav");
+                AudioEngine::pause(this->soundEffect);
+                AudioEngine::pause(this->bgmusic);
+                auto pause = PauseGame::createScene(this->damage);
+                Director::getInstance()->replaceScene(TransitionFade::create(1,pause));
+            }),
+        };
+
+        auto menu = Menu::createWithArray(menuItems);
+        addChild(menu);
+        menu->setAnchorPoint(Vec2(0,0));
+        menu->setScale(0.3);
+        menu->setPosition(Vec2(25, visibleSize.height - 25));
 }
 void GameScene::update(float dt)
 {
@@ -102,13 +135,14 @@ void GameScene::initPlayerUI()
     //damage
     this->damgeNode = Node::create();
     Sprite* damage = Sprite::create("damage.png");
-    damage->setPosition(Vec2(visibleSize.width - 65, visibleSize.height - 20));
+    damage->setPosition(Vec2(visibleSize.width - 65, visibleSize.height - 30));
     damage->setContentSize(Size(20, 20));
     
     Label* damageLabel = Label::createWithTTF("5", "fonts/Marker Felt.ttf", 20);
     damageLabel->setName("damageLabel");
     damageLabel->setAnchorPoint(Vec2(0, 0.5));
-    damageLabel->setPosition(Vec2(visibleSize.width - 50, visibleSize.height - 23));
+    damageLabel->setColor(Color3B::GREEN);
+    damageLabel->setPosition(Vec2(visibleSize.width - 50, visibleSize.height - 33));
     addChild(this->damgeNode);
     this->damgeNode->addChild(damage);
     this->damgeNode->addChild(damageLabel);
@@ -177,7 +211,7 @@ void GameScene::BackGround()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     //backgournd
-    auto bg = Sprite::create("bg_01.png");
+    auto bg = Sprite::create("Spa.png");
     bg->setContentSize(Size(visibleSize.width, visibleSize.height));
     bg->setAnchorPoint(Vec2(0, 0));
     addChild(bg);
@@ -188,6 +222,14 @@ void GameScene::BackGround()
     this->planet->setPosition(Vec2(0, 770));
     this->planet->setScale(5);
     addChild(this->planet);
+    
+    AudioEngine::preload("sound/bgmusic.wav");
+    scheduleOnce([&](float dt)
+    {
+        this->bgmusic = AudioEngine::play2d("sound/bgmusic.wav");
+        AudioEngine::setVolume(bgmusic, 1);
+    }, 1,"deplay");
+    
 }
 void GameScene::SpawnEnemies()
 {
@@ -199,6 +241,12 @@ void GameScene::SpawnEnemies()
 
     savenger = Savenger::create();
     addChild(savenger);
+    
+    raptor1 = Raptor1::create();
+    addChild(raptor1);
+    
+    raptor2 = Raptor2::create();
+    addChild(raptor2);
 
     this->WaveEnemies();
 }
@@ -212,7 +260,16 @@ void GameScene::WaveEnemies()
         addChild(boss);
 
         boss->player = this->player;
+        
+        //boss->hp = this->boss->maxHP;
+        
+        this->schedule([&](float dt)
+            {
+                //this->PlayerDie();
+                this->WinGame();
+            }, 0.01, "WinGame");
     }
+    
 }
 void GameScene::initContactListener() {
     auto contactListener = EventListenerPhysicsContact::create();
@@ -223,8 +280,20 @@ void GameScene::PlayerDie()
 {
     if (this->player->hp <= 0)
     {
-        auto hello = HelloWorld::createScene();
-        Director::getInstance()->replaceScene(TransitionFade::create(0.5, hello));
+        this->player->pause();
+        AudioEngine::pause(this->bgmusic);
+        auto lose = LoseScene::createScene(this->damage);
+        Director::getInstance()->replaceScene(TransitionFade::create(0.5, lose));
+    }
+   
+}
+void GameScene::WinGame()
+{
+    if(boss->hp <= 0 )
+    {
+        AudioEngine::pause(this->bgmusic);
+        auto hello = HelloWorld::createScene(this->damage);
+        Director::getInstance()->replaceScene(TransitionFade::create(0.5 ,hello));
     }
 }
 void GameScene::HealthPlayer()
@@ -247,7 +316,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
                 auto savengerBody = dynamic_cast<Savenger*>(nodeB->getNode());
                 this->savenger->setHealthEnemy();
-                this->damage += 25;
+                this->damage += 21;
+                
             }
         }
         if (nodeB->getCollisionBitmask() == 15)
@@ -258,6 +328,7 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
                 auto savengerBody = dynamic_cast<Savenger*>(nodeA->getNode());
                 this->savenger->setHealthEnemy();
+                
             }
         }
     }
@@ -274,6 +345,7 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 auto raptorBody = dynamic_cast<Raptor*>(nodeB->getNode());
                 this->raptor->setHealthEnemy();
                 this->damage += 25;
+               
             }
         }
         if (nodeB->getCollisionBitmask() == 15)
@@ -284,6 +356,63 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
                 auto raptorBody = dynamic_cast<Raptor*>(nodeA->getNode());
                 this->raptor->setHealthEnemy();
+                
+            }
+        }
+    }
+    //Raptor1
+    if (nodeA->getCollisionBitmask() == 15 && nodeB->getCollisionBitmask() == 31 ||
+        nodeB->getCollisionBitmask() == 31 && nodeA->getCollisionBitmask() == 15)
+    {
+        if (nodeA->getCollisionBitmask() == 15)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+
+                auto raptorBody = dynamic_cast<Raptor*>(nodeB->getNode());
+                this->raptor1->setHealthEnemy();
+                this->damage += 25;
+               
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 15)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+
+                auto raptorBody = dynamic_cast<Raptor*>(nodeA->getNode());
+                this->raptor1->setHealthEnemy();
+                
+            }
+        }
+    }
+    //Raptor2
+    if (nodeA->getCollisionBitmask() == 15 && nodeB->getCollisionBitmask() == 32 ||
+        nodeB->getCollisionBitmask() == 32 && nodeA->getCollisionBitmask() == 15)
+    {
+        if (nodeA->getCollisionBitmask() == 15)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+
+                auto raptorBody = dynamic_cast<Raptor*>(nodeB->getNode());
+                this->raptor2->setHealthEnemy();
+                this->damage += 25;
+               
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 15)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+
+                auto raptorBody = dynamic_cast<Raptor*>(nodeA->getNode());
+                this->raptor2->setHealthEnemy();
+                
             }
         }
     }
@@ -300,6 +429,7 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 auto AsteroidBody = dynamic_cast<Asteroid*>(nodeB->getNode());
                 this->asteroid->setHealthEnemy();
                 this->damage += 1;
+                
             }
         }
         if (nodeB->getCollisionBitmask() == 15)
@@ -310,6 +440,7 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
                 auto AsteroidBody = dynamic_cast<Asteroid*>(nodeB->getNode());
                 this->asteroid->setHealthEnemy();
+                
             }
         }
     }
@@ -324,8 +455,9 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 nodeA->getNode()->removeFromParentAndCleanup(true);
 
                 auto BossBody = dynamic_cast<Boss*>(nodeB->getNode());
-                this->boss->setHealthEnemy();
+                this->boss->setHealthBoss();
                 this->damage += random(17,25);
+                
             }
         }
         if (nodeB->getCollisionBitmask() == 15)
@@ -335,7 +467,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 nodeB->getNode()->removeFromParentAndCleanup(true);
 
                 auto BossBody = dynamic_cast<Boss*>(nodeB->getNode());
-                this->boss->setHealthEnemy();
+                this->boss->setHealthBoss();
+                
             }
         }
     }
@@ -351,6 +484,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
                 auto Body = dynamic_cast<Player*>(nodeB->getNode());
                 this->player->setHealPlayer();
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
         if (nodeB->getCollisionBitmask() == 25)
@@ -361,6 +496,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
 
                 auto Body = dynamic_cast<Player*>(nodeB->getNode());
                 this->player->setHealPlayer();
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
     }
@@ -376,6 +513,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 this->player->setHealPlayer();
 
                 nodeB->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
         if (nodeB->getCollisionBitmask() == 1)
@@ -401,6 +540,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 this->player->setHealPlayer();
 
                 nodeB->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
         if (nodeB->getCollisionBitmask() == 1)
@@ -411,6 +552,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 this->player->setHealPlayer();
 
                 nodeA->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
         return true;
@@ -427,6 +570,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 this->player->setHealPlayer();
 
                 nodeB->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
         if (nodeB->getCollisionBitmask() == 1)
@@ -437,6 +582,66 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 this->player->setHealPlayer();
 
                 nodeA->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
+            }
+        }
+    }
+    //Raptor1 vs Player
+    if (nodeA->getCollisionBitmask() == 1 && nodeB->getCollisionBitmask() == 31 ||
+        nodeB->getCollisionBitmask() == 31 && nodeA->getCollisionBitmask() == 1)
+    {
+        if (nodeA->getCollisionBitmask() == 1)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                auto Body = dynamic_cast<Player*>(nodeB->getNode());
+                this->player->setHealPlayer();
+
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 1)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                auto Body = dynamic_cast<Player*>(nodeB->getNode());
+                this->player->setHealPlayer();
+
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
+            }
+        }
+    }
+    //Raptor2 vs Player
+    if (nodeA->getCollisionBitmask() == 1 && nodeB->getCollisionBitmask() == 32 ||
+        nodeB->getCollisionBitmask() == 32 && nodeA->getCollisionBitmask() == 1)
+    {
+        if (nodeA->getCollisionBitmask() == 1)
+        {
+            if (nodeA->getNode() != nullptr && nodeB->getNode())
+            {
+                auto Body = dynamic_cast<Player*>(nodeB->getNode());
+                this->player->setHealPlayer();
+
+                nodeB->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
+            }
+        }
+        if (nodeB->getCollisionBitmask() == 1)
+        {
+            if (nodeB->getNode() != nullptr && nodeA->getNode())
+            {
+                auto Body = dynamic_cast<Player*>(nodeB->getNode());
+                this->player->setHealPlayer();
+
+                nodeA->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
     }
@@ -451,6 +656,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 //nodeA->getNode()->removeFromParentAndCleanup(true);
                 auto Body = dynamic_cast<Player*>(nodeB->getNode());
                 this->player->setHealPlayer();
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
         if (nodeB->getCollisionBitmask() == 1)
@@ -460,6 +667,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 //nodeB->getNode()->removeFromParentAndCleanup(true);
                 auto Body = dynamic_cast<Player*>(nodeB->getNode());
                 this->player->setHealPlayer();
+                soundEffect = AudioEngine::play2d("sound/hit.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
     }
@@ -474,6 +683,9 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 auto Body = dynamic_cast<Player*>(nodeB->getNode());
                 this->player->setHealth();
                 nodeB->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/health.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
+                this->damage += 10;
             }
         }
         if (nodeB->getCollisionBitmask() == 1)
@@ -483,6 +695,8 @@ bool GameScene::onContactBegin(PhysicsContact& contact) {
                 auto Body = dynamic_cast<Player*>(nodeB->getNode());
                 this->player->setHealth();
                 nodeA->getNode()->removeFromParentAndCleanup(true);
+                soundEffect = AudioEngine::play2d("sound/health.wav");
+                AudioEngine::setVolume(soundEffect, 0.5);
             }
         }
     }

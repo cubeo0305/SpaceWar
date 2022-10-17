@@ -15,7 +15,7 @@ public:
 	virtual bool init();
 	
 	float maxHP;
-
+    int soundexplosion;
 	PhysicsBody* body;
 	cocos2d::Sprite* savenger;
 	void AvenMove();

@@ -2,7 +2,6 @@
 #define __HEALTH_H__
 
 #include "cocos2d.h"
-#include "GameManager.h"
 #include "Enemy.h"
 #include "Count.h"
 

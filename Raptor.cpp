@@ -1,4 +1,5 @@
 #include "Raptor.h"
+#include "AudioEngine.h"
 USING_NS_CC;
 
 Raptor* Raptor::createRaptor()
@@ -33,8 +34,6 @@ bool Raptor::init()
     this->scheduleUpdate();
     this->RaptorMove();
 
-    //this->EnemiesMove(true);
-
     //PhysicsBody
     this->body = PhysicsBody::createBox(this->raptor->getContentSize());
     this->body->setDynamic(false);
@@ -55,18 +54,27 @@ int Raptor::getHealthEnemy()
 void Raptor::setHealthEnemy()
 {
     this->healthEnemy -= 25;
+    soundexplosion = AudioEngine::play2d("sound/hit.wav");
+    AudioEngine::setVolume(soundexplosion, 0.3);
     if (this->healthEnemy <= 0)
     {
         this->raptor->removeFromParentAndCleanup(true);
         this->unschedule("RaptorShooting");
+        this->soundexplosion = AudioEngine::play2d("sound/die.wav");
+        AudioEngine::setVolume(soundexplosion, 0.2);
+
     }
 }
 void Raptor::Shooting()
 {
+    this->soundshoot = AudioEngine::play2d("sound/laser.wav");
+    AudioEngine::setVolume(soundshoot, 0.5);
+    
     bullet = BulletEnemy::create();
     addChild(bullet);
     bullet->setPosition(Vec2((int)raptor->getPositionX(),
-        (int)raptor->getPositionY() - 15));
+        (int)raptor->getPositionY() - 20));
+    
 }
 void Raptor::RaptorMove()
 {
@@ -76,37 +84,5 @@ void Raptor::RaptorMove()
     if (this->raptor->getPositionY() <= -20)
     {
         this->raptor->removeFromParentAndCleanup(true);
-    }
-}
-void Raptor::EnemiesMove(bool isStart = false)
-{
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    if (isStart)
-    {
-        this->raptor->setPosition(Vec2(visibleSize.width / 2, 900));
-        auto moveDown = MoveTo::create(2, Vec2(visibleSize.width / 2, 650));
-        this->raptor->runAction(Sequence::create(moveDown, CallFunc::create([&]() {
-            EnemiesMove(false);
-            }),nullptr));
-    }
-    else
-    {
-        int positionMax_X = visibleSize.width;
-        int positionMin_X = 0;
-        int positionMax_Y = visibleSize.height;
-        int positionMin_Y = visibleSize.height / 2;
-
-        int positionX = rand() % -(positionMax_X - positionMin_X + 1) + positionMin_X;
-        int positionY = rand() % -(positionMax_Y - positionMin_Y + 1) + positionMin_Y;
-
-        Vec2 position = Vec2(positionX, positionY);
-        auto moveTo = MoveTo::create(2, Vec2(position));
-        auto sequen = Sequence::create(moveTo, CallFunc::create([&]()
-            {
-                EnemiesMove(false);
-            }),nullptr);
-        this->raptor->runAction(sequen);
     }
 }

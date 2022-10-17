@@ -1,4 +1,5 @@
 #include "Asteroid.h"
+#include "AudioEngine.h"
 USING_NS_CC;
 
 Asteroid* Asteroid::createAsteroid()
@@ -40,9 +41,13 @@ int Asteroid::getHealthEnemy()
 void Asteroid::setHealthEnemy()
 {
     this->healthEnemy -= 25;
+    sound = AudioEngine::play2d("sound/hit.wav");
+    AudioEngine::setVolume(sound, 0.3);
     if (this->healthEnemy <= 0)
     {
         this->asteroid->removeFromParentAndCleanup(true);
+        this->sound = AudioEngine::play2d("sound/die.wav");
+        AudioEngine::setVolume(sound, 0.2);
     }
 }
 void Asteroid::update(float dt)

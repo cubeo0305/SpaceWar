@@ -1,4 +1,5 @@
 #include "Boss.h"
+#include "AudioEngine.h"
 #include "HelloWorldScene.h"
 
 USING_NS_CC;
@@ -20,7 +21,7 @@ bool Boss::init()
     bossgun->setPosition(Vec2(8.3, 10));
     bossgun->setContentSize(Size(15, 15));
     //Sprite Boss
-    this->boss = Sprite::create("TieF.png");
+    this->boss = Sprite::create("Tie F.png");
     this->boss->setPosition(Vec2(visibleSize.width/2 , 650));
     this->boss->setScale(5);
     addChild(this->boss);
@@ -54,23 +55,30 @@ void Boss::initLis()
     this->body->setCollisionBitmask(50);
     this->boss->addComponent(this->body);
 }
-int Boss::getHealthEnemy()
+int Boss::getHealthBoss()
 {
     return this->maxHP;
 }
-void Boss::setHealthEnemy()
+void Boss::setHealthBoss()
 {
-    this->hp -= random(17,25);
-    if (this->hp <= 0)
+    hp -= random(17,25);
+    sound = AudioEngine::play2d("sound/hit.wav");
+    AudioEngine::setVolume(sound, 0.3);
+    if (hp <= 0)
     {
         this->boss->removeFromParentAndCleanup(true);
         this->unschedule("BossShooting");
         this->unschedule("GunLook");
-
-        auto hello = HelloWorld::createScene();
-        Director::getInstance()->replaceScene(TransitionFade::create(5 ,hello));
+        
+        
+        this->sound = AudioEngine::play2d("sound/die.wav");
+        AudioEngine::setVolume(this->sound, 0.2);
+        
+        //next scene win game
+        
         //this->player->unschedule("PlayerShooting");
     }
+    
 }
 void Boss::update(float dt)
 {
@@ -123,6 +131,8 @@ void Boss::Shooting()
     bullet->setPosition(Vec2((int)boss->getPositionX(),
         (int)boss->getPositionY() - 45));
     bullet->setRotation(angle);
+    this->soundshoot = AudioEngine::play2d("sound/laser.wav");
+    AudioEngine::setVolume(soundshoot, 0.8);
 }
 void Boss::GunLook() 
 {

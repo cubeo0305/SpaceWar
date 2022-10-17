@@ -17,7 +17,7 @@ bool Player::init()
         return false;
     }
     this->speed = 300;
-    this->direction = Vec2(1, 1);
+    this->direction = Vec2(0,0);
     
     this->maxHP = 100;
     hp = this->maxHP;
@@ -38,11 +38,7 @@ int Player::getHealPlayer()
 }
 void Player::setHealPlayer()
 {
-    hp -= 10;
-    if (hp <= 0)
-    {
-        this->pause();
-    }
+    hp -= 15;
 }
 void Player::setHealth()
 {
@@ -146,10 +142,9 @@ void Player::onMouseDown(Event* event)
 }
 void Player::Shooting()
 {
+    this->soundshoot = AudioEngine::play2d("sound/laser.wav");
+    AudioEngine::setVolume(this->soundshoot, 0.1);
     
-
-    this->soundshoot = AudioEngine::play2d("sound/laser.wav", true);
-
     bullet = BulletPlayer::create();
     addChild(bullet);
     bullet->setPosition(Vec2((int)player->getPositionX(),

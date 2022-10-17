@@ -21,10 +21,12 @@ public:
     cocos2d::Vec2 direction;
     float speed;
     cocos2d::Sprite* raptor;
-
+    int soundshoot;
+    int soundexplosion;
+    
     PhysicsBody* body;
     void Shooting();
-    void EnemiesMove(bool isStart);
+    //void EnemiesMove(bool isStart);
     void RaptorMove();
 
     int getHealthEnemy();

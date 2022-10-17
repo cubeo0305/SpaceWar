@@ -16,7 +16,7 @@ bool BulletEnemy::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     //Sprite Bullet & Action
-    this->bulletenemy = Sprite::create("bpum2.png");
+    this->bulletenemy = Sprite::create("bpum1.png");
     this->bulletenemy->setScale(1.5);
     this->bulletenemy->setRotation(180);
     addChild(this->bulletenemy);

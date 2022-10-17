@@ -7,6 +7,8 @@
 #include "Savenger.h"
 #include "Asteroid.h"
 #include "Boss.h"
+#include "Raptor1.h"
+#include "Raptor2.h"
 #include "Health.h"
 #include "Enemy.h"
 
@@ -26,6 +28,8 @@ public:
 
     Player* player;
     Raptor* raptor;
+    Raptor1* raptor1;
+    Raptor2* raptor2;
     Savenger* savenger;
     Asteroid* asteroid;
     Boss* boss;
@@ -34,7 +38,9 @@ public:
     Node* damgeNode;
 
     int damage;
-
+    int soundEffect;
+    int bgmusic;
+    
     cocos2d::Sprite* planet;
     cocos2d::Sprite* clouds;
     void InitGame();
@@ -44,11 +50,13 @@ public:
     void WaveEnemies();
     void initContactListener();
     void PlayerDie();
+    void WinGame();
     void BackGround();
     void HealthPlayer();
     void initPlayerUI();
     void updatePlayerUI();
     void cloud();
+    void pauseGame();
 
     void SpawnEnemies();
     // a selector callback

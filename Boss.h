@@ -2,7 +2,6 @@
 #define __Boss_H__
 
 #include "cocos2d.h"
-#include "GameManager.h"
 #include "Enemy.h"
 #include "BulletEnemyBoss.h"
 #include "Player.h"
@@ -10,7 +9,7 @@
 
 using namespace cocos2d;
 
-class Boss : public Enemy
+class Boss : public Node
 {
 private:
 public:
@@ -22,6 +21,8 @@ public:
 	Player* player;
 
 	float maxHP;
+    int sound;
+    int soundshoot;
 	int hp;
 	cocos2d::Sprite* boss;
 	cocos2d::Sprite* bossgun;
@@ -32,8 +33,8 @@ public:
 	void GunLook();
 	void update(float dt);
 
-	int getHealthEnemy();
-	void setHealthEnemy();
+	int getHealthBoss();
+	void setHealthBoss();
 
     CREATE_FUNC(Boss);
 };
